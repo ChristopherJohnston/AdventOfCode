@@ -34,11 +34,19 @@ namespace app
                 for (var j=i; j<arr.Length; j++) {
                     var v2 = arr[j];
 
-                    if (v1+v2 == target) {
-                        Console.WriteLine("Result is {0}", v1*v2);
-                        return;
+                    for (var k=j; k<arr.Length; k++) {
+                        var v3 = arr[k];
+
+                        if (v1+v2+v3 == target) {
+                            Console.WriteLine("Result is {0}", v1*v2*v3);
+                            return;
+                        }
+                        else if (v1+v2+v3 > target) {
+                            break;
+                        }
                     }
-                    else if (v1+v2 > target) {
+
+                    if (v1+v2 > target) {
                         break;
                     }
                 }
