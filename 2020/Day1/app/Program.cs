@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace app
 {
@@ -10,23 +11,45 @@ namespace app
         {
             var target = 2020;
 
-            // Open the file
-            var file = File.OpenText(@"input.txt");
-            var lines = file.ReadToEnd().Split("\n");
-            file.Close();
+            // Open the file and create an array of figures
+            List<int> lines = File.ReadAllLines(@"input.txt").Select(int.Parse).ToList();
 
-            // Read the values into an integer list
-            List<int> values = new List<int>();
-            foreach (var line in lines) {
-                values.Add(Int32.Parse(line));
+            lines.Sort();
+            int[] arr = lines.ToArray();
+            iterate(target, arr);       
+
+            int[] values = lines.ToArray();
+            HashSet<int> h = new HashSet<int>(values);
+            find(target, values, h);
+            find3(target, values, h);
+        }
+
+        static void find(int target, int[] arr, HashSet<int> h) {
+            foreach (var i in arr) {
+                var remainder = target - i;
+                if (h.Contains(remainder)) {
+                    Console.WriteLine("Result is {0} * {1} = {2}", i, remainder, i*remainder);
+                    break;
+                }
             }
+        }
 
-            // Sort the list
-            values.Sort();
+        static void find3(int target, int[] arr, HashSet<int> h) {
+            for (int i=0; i<arr.Length; i++) {
+                var n1 = arr[i];
+                var remainder = target - n1;
+                for (int j=i; j<arr.Length; j++) {
+                    var n2 = arr[j];
+                    if (h.Contains(remainder - n2)) {
+                        Console.WriteLine("Result is {0} * {1} * {2} = {3}", n1, n2, remainder-n2, n1*n2*(remainder-n2));
+                        return;
+                    }
+                }
+            }
+        }
 
-            var arr = values.ToArray();
-
-            // iterate
+        static void iterate(int target, int[] arr) {
+            // nested iteration to find the result
             for (var i=0; i<arr.Length; i++)
             {
                 var v1 = arr[i];
