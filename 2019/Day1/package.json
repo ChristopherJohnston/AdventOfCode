@@ -1,0 +1,11 @@
+{
+  "name": "fuel-calc",
+  "version": "1.0.0",
+  "description": "Calculate fuel required from mass of sleigh",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Chris Johnston",
+  "license": "ISC"
+}

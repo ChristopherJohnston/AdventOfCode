@@ -1,0 +1,11 @@
+/Users/chris/Development/AdventOfCode/2019/Day8/app/bin/Debug/netcoreapp3.1/app
+/Users/chris/Development/AdventOfCode/2019/Day8/app/bin/Debug/netcoreapp3.1/app.deps.json
+/Users/chris/Development/AdventOfCode/2019/Day8/app/bin/Debug/netcoreapp3.1/app.runtimeconfig.json
+/Users/chris/Development/AdventOfCode/2019/Day8/app/bin/Debug/netcoreapp3.1/app.runtimeconfig.dev.json
+/Users/chris/Development/AdventOfCode/2019/Day8/app/bin/Debug/netcoreapp3.1/app.dll
+/Users/chris/Development/AdventOfCode/2019/Day8/app/bin/Debug/netcoreapp3.1/app.pdb
+/Users/chris/Development/AdventOfCode/2019/Day8/app/obj/Debug/netcoreapp3.1/app.csprojAssemblyReference.cache
+/Users/chris/Development/AdventOfCode/2019/Day8/app/obj/Debug/netcoreapp3.1/app.AssemblyInfoInputs.cache
+/Users/chris/Development/AdventOfCode/2019/Day8/app/obj/Debug/netcoreapp3.1/app.AssemblyInfo.cs
+/Users/chris/Development/AdventOfCode/2019/Day8/app/obj/Debug/netcoreapp3.1/app.dll
+/Users/chris/Development/AdventOfCode/2019/Day8/app/obj/Debug/netcoreapp3.1/app.pdb
