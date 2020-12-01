@@ -61,7 +61,7 @@ namespace app
                         var v3 = arr[k];
 
                         if (v1+v2+v3 == target) {
-                            Console.WriteLine("Result is {0}", v1*v2*v3);
+                            Console.WriteLine("Result is {0} * {1} * {2} = {3}", v1, v2, v3, v1*v2*v3);
                             return;
                         }
                         else if (v1+v2+v3 > target) {
