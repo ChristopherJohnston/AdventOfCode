@@ -18,13 +18,20 @@ namespace app
         static void Main(string[] args)
         {
             var passwords = ParseInput();
-            var validPasswords = 0;
+            var validPasswords_SledRental = 0;
+            var validPasswords_TobogganCorporate = 0;
+
             foreach (var password in passwords) {
-                if (isValid(password)) {
-                    validPasswords +=1;
+                if (isValid_SledRental(password)) {
+                    validPasswords_SledRental +=1;
+                }
+
+                if (isValid_TobogganCorporate(password)) {
+                    validPasswords_TobogganCorporate +=1;
                 }
             }
-            Console.WriteLine(validPasswords);
+            Console.WriteLine("Valid Password for SledRental (Part 1): {0}", validPasswords_SledRental);
+            Console.WriteLine("Valid Password for TobogganCorporate (Part 2): {0}", validPasswords_TobogganCorporate);
         }
 
         static List<PasswordItem> ParseInput() {
@@ -46,7 +53,7 @@ namespace app
             return p;
         }
 
-        static bool isValid(PasswordItem passwordItem) {
+        static bool isValid_SledRental(PasswordItem passwordItem) {
             var letterCount = 0;
             foreach (char letter in passwordItem.password) {
                 if (letter == passwordItem.letter) {
@@ -62,6 +69,12 @@ namespace app
                 return false;
             }
             return true;
+        }
+
+        static bool isValid_TobogganCorporate(PasswordItem passwordItem) {
+            var slot1ContainsLetter = (passwordItem.password[passwordItem.min-1] == passwordItem.letter);
+            var slot2ContainsLetter = (passwordItem.password[passwordItem.max-1] == passwordItem.letter);
+            return slot1ContainsLetter ^ slot2ContainsLetter;
         }
     }
 }
