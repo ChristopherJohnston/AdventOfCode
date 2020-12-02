@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import argparse
+import sys
+import os
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog='setup',
+        description="Daily setup script"
+    )
+    parser.add_argument('day', type=str, help="The day to set up.")
+    parser.add_argument('--part', type=str, help="The part of the day.")
+    parser.set_defaults(part='1')
+    args = parser.parse_args()
+
+    os.system("git checkout -b 2020_Day{0}_Part{1}".format(args.day, args.part))
+    os.system("dotnet new sln -o Day{0}".format(args.day))
+    os.chdir("./Day{0}".format(args.day))
+    os.system("dotnet new console -o app")
+    os.system("dotnet sln add app/app.csproj")
+    os.system("code .")
+
+
+if __name__ == '__main__':
+    main()
