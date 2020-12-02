@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace app
 {
@@ -17,15 +17,15 @@ namespace app
     {
         static void Main(string[] args)
         {
-            var validPasswords_SledRental = 0;
-            var validPasswords_TobogganCorporate = 0;
+            int validPasswords_SledRental = 0;
+            int validPasswords_TobogganCorporate = 0;
 
-            foreach (var password in ParseInput()) {
-                if (isValid_SledRental(password)) {
+            foreach (PasswordItem passwordItem in ParseInput()) {
+                if (isValid_SledRental(passwordItem)) {
                     validPasswords_SledRental +=1;
                 }
 
-                if (isValid_TobogganCorporate(password)) {
+                if (isValid_TobogganCorporate(passwordItem)) {
                     validPasswords_TobogganCorporate +=1;
                 }
             }
@@ -39,7 +39,7 @@ namespace app
             Regex pattern = new Regex(@"([0-9]+)-([0-9]+) ([a-z]): ([0-9A-Za-z]+)");
 
             foreach (string line in lines) {
-                var match = pattern.Match(line);
+                Match match = pattern.Match(line);
 
                 yield return new PasswordItem() { 
                     min=int.Parse(match.Groups[1].Value),
@@ -51,26 +51,15 @@ namespace app
         }
 
         static bool isValid_SledRental(PasswordItem passwordItem) {
-            var letterCount = 0;
-            foreach (char letter in passwordItem.password) {
-                if (letter == passwordItem.letter) {
-                    letterCount +=1;
-                }
-
-                if (letterCount > passwordItem.max) {
-                    return false;
-                }
-            }
-
-            if (letterCount < passwordItem.min) {
-                return false;
-            }
-            return true;
+            int letterCount = passwordItem.password.Count((letter) => letter == passwordItem.letter);
+            return (letterCount >= passwordItem.min) && (letterCount <= passwordItem.max);
         }
 
         static bool isValid_TobogganCorporate(PasswordItem passwordItem) {
-            var slot1ContainsLetter = (passwordItem.password[passwordItem.min-1] == passwordItem.letter);
-            var slot2ContainsLetter = (passwordItem.password[passwordItem.max-1] == passwordItem.letter);
+            // N.B. The rule was redefined to mean: min = first location of letter, max = second locaiton of letter
+            // Indexing for the password starts at 1
+            bool slot1ContainsLetter = (passwordItem.password[passwordItem.min-1] == passwordItem.letter);
+            bool slot2ContainsLetter = (passwordItem.password[passwordItem.max-1] == passwordItem.letter);
             return slot1ContainsLetter ^ slot2ContainsLetter;
         }
     }
