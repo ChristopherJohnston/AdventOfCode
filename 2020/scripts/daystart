@@ -15,6 +15,7 @@ def main():
 
     os.system("git checkout -b 2020_Day{0}_Part{1}".format(args.day, args.part))
     os.system("dotnet new sln -o Day{0}".format(args.day))
+    os.system("cp ./scripts/.gitignore ./Day{0}/.gitignore".format(args.day))
     os.chdir("./Day{0}".format(args.day))
     os.system("dotnet new console -o app")
     os.system("dotnet sln add app/app.csproj")
