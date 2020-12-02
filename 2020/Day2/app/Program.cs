@@ -17,11 +17,10 @@ namespace app
     {
         static void Main(string[] args)
         {
-            var passwords = ParseInput();
             var validPasswords_SledRental = 0;
             var validPasswords_TobogganCorporate = 0;
 
-            foreach (var password in passwords) {
+            foreach (var password in ParseInput()) {
                 if (isValid_SledRental(password)) {
                     validPasswords_SledRental +=1;
                 }
@@ -30,27 +29,25 @@ namespace app
                     validPasswords_TobogganCorporate +=1;
                 }
             }
+
             Console.WriteLine("Valid Password for SledRental (Part 1): {0}", validPasswords_SledRental);
             Console.WriteLine("Valid Password for TobogganCorporate (Part 2): {0}", validPasswords_TobogganCorporate);
         }
 
-        static List<PasswordItem> ParseInput() {
+        static IEnumerable<PasswordItem> ParseInput() {
             string[] lines = File.ReadAllLines(@"input.txt");
-            var p = new List<PasswordItem>();
             Regex pattern = new Regex(@"([0-9]+)-([0-9]+) ([a-z]): ([0-9A-Za-z]+)");
 
             foreach (string line in lines) {
                 var match = pattern.Match(line);
 
-                p.Add(new PasswordItem() { 
+                yield return new PasswordItem() { 
                     min=int.Parse(match.Groups[1].Value),
                     max=int.Parse(match.Groups[2].Value),
                     letter=match.Groups[3].Value.ToCharArray()[0],
                     password=match.Groups[4].Value
-                });
+                };
             }
-            
-            return p;
         }
 
         static bool isValid_SledRental(PasswordItem passwordItem) {
