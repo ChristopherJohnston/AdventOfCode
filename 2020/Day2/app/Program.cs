@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace app
 {
-    struct Password {
+    struct PasswordItem {
         public int min;
         public int max;
         public char letter;
@@ -27,14 +27,15 @@ namespace app
             Console.WriteLine(validPasswords);
         }
 
-        static List<Password> ParseInput() {
+        static List<PasswordItem> ParseInput() {
             string[] lines = File.ReadAllLines(@"input.txt");
-            var p = new List<Password>();
+            var p = new List<PasswordItem>();
             Regex pattern = new Regex(@"([0-9]+)-([0-9]+) ([a-z]): ([0-9A-Za-z]+)");
+
             foreach (string line in lines) {
                 var match = pattern.Match(line);
 
-                p.Add(new Password() { 
+                p.Add(new PasswordItem() { 
                     min=int.Parse(match.Groups[1].Value),
                     max=int.Parse(match.Groups[2].Value),
                     letter=match.Groups[3].Value.ToCharArray()[0],
@@ -45,19 +46,19 @@ namespace app
             return p;
         }
 
-        static bool isValid(Password password) {
+        static bool isValid(PasswordItem passwordItem) {
             var letterCount = 0;
-            foreach (char letter in password.password) {
-                if (letter == password.letter) {
+            foreach (char letter in passwordItem.password) {
+                if (letter == passwordItem.letter) {
                     letterCount +=1;
                 }
 
-                if (letterCount > password.max) {
+                if (letterCount > passwordItem.max) {
                     return false;
                 }
             }
 
-            if (letterCount < password.min) {
+            if (letterCount < passwordItem.min) {
                 return false;
             }
             return true;
