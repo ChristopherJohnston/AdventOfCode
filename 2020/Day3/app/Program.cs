@@ -7,8 +7,10 @@ namespace app
 {
     class Program
     {
-        static void WriteLineToConsole(string line, int startLocation, int endLocation, int numTrees)
+        static void WriteLineToConsole(string line, int startLocation, int nAcross, int numTrees)
         {
+            int endLocation = (startLocation+nAcross+line.Length) % line.Length;
+
             for (int i=0; i<line.Length; i++) {
                 if ((endLocation>startLocation && i >= startLocation && i <= endLocation) || (startLocation>endLocation && (i <=endLocation || i>=startLocation))) {
                     Console.BackgroundColor = ConsoleColor.Black;
@@ -44,16 +46,11 @@ namespace app
             foreach (string line in ParseInput(nDown)) {
                 if (line[currentPos] == '#') {
                     numTrees++;
-                }
+                }            
 
-                int newPos = currentPos + nAcross;
-                if (newPos >= line.Length) {
-                    newPos = 0 + (newPos - line.Length);
-                }
-
-                // WriteLineToConsole(line, currentPos, newPos, numTrees);
+                // WriteLineToConsole(line, currentPos, nAcross, numTrees);
                 
-                currentPos = newPos;
+                currentPos = (currentPos+nAcross+line.Length) % line.Length;
             }
             return numTrees;
         }
