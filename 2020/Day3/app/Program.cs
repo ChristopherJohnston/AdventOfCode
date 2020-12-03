@@ -41,19 +41,14 @@ namespace app
             int currentPos = 0;
             int numTrees = 0;
 
-            string[] map = ParseInput().ToArray();
-            int lineWidth = map[0].Length;
-
-            for (int currentLine=0; currentLine<map.Length; currentLine+=nDown) {
-                string line = map[currentLine];
-
+            foreach (string line in ParseInput(nDown)) {
                 if (line[currentPos] == '#') {
                     numTrees++;
                 }
 
                 int newPos = currentPos + nAcross;
-                if (newPos >= lineWidth) {
-                    newPos = 0 + (newPos - lineWidth);
+                if (newPos >= line.Length) {
+                    newPos = 0 + (newPos - line.Length);
                 }
 
                 // WriteLineToConsole(line, currentPos, newPos, numTrees);
@@ -63,11 +58,11 @@ namespace app
             return numTrees;
         }
 
-        static IEnumerable<string> ParseInput() {
+        static IEnumerable<string> ParseInput(int nDown) {
             string[] lines = File.ReadAllLines(@"input.txt");
 
-            foreach (string line in lines) {
-                yield return line;
+            for (int i=0; i<lines.Length; i+=nDown) {
+                yield return lines[i];
             }
         }
     }
