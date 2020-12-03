@@ -28,27 +28,39 @@ namespace app
         }
 
         static void Main(string[] args)
-        {
+        {            
+            long s1 = RunScenario(1,1);
+            long s2 = RunScenario(3,1);
+            long s3 = RunScenario(5,1);
+            long s4 = RunScenario(7,1);
+            long s5 = RunScenario(1,2);
+            Console.WriteLine("Result: {0} * {1} * {2} * {3} * {4} = {5}", s1,s2,s3,s4,s5,s1*s2*s3*s4*s5);
+        }
+
+        static int RunScenario(int nAcross, int nDown) {
             int currentPos = 0;
             int numTrees = 0;
 
             string[] map = ParseInput().ToArray();
             int lineWidth = map[0].Length;
 
-            foreach (string line in map) {
+            for (int currentLine=0; currentLine<map.Length; currentLine+=nDown) {
+                string line = map[currentLine];
+
                 if (line[currentPos] == '#') {
                     numTrees++;
                 }
 
-                int newPos = currentPos + 3;
+                int newPos = currentPos + nAcross;
                 if (newPos >= lineWidth) {
                     newPos = 0 + (newPos - lineWidth);
                 }
 
-                WriteLineToConsole(line, currentPos, newPos, numTrees);
+                // WriteLineToConsole(line, currentPos, newPos, numTrees);
                 
                 currentPos = newPos;
             }
+            return numTrees;
         }
 
         static IEnumerable<string> ParseInput() {
