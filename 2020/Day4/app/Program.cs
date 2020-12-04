@@ -38,10 +38,7 @@ namespace app
                 } else {
                     currentPassport += lines[i] + " ";
                 }                
-            }
-            
-            // There may not be a trailing line at the end of the file
-            yield return currentPassport.TrimEnd();
+            }            
         }
     }
 }
