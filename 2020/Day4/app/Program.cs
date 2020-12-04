@@ -9,30 +9,20 @@ namespace app
     class Program
     {
         static void Main(string[] args)
-        {
+        {            
             bool skipValidation = false; // true for part 1, false for part2
-
-            Func<string,int,int, bool> IsValidYear = (value, min, max) => {
-                int year;
-                return (int.TryParse(value, out year) && year>=min && year<=max);
-            };
 
             int nValid = ParseInput().Select( (passport) => {
                 var dict = passport.Split(' ').Select(p=>p.Split(':')).ToDictionary(sp => sp[0], sp=>sp[1]);
                 
                 // Required keys and their validtors
                 return new (string key, Func<string, bool> validator)[] {
-                    ("byr", (s)=> IsValidYear(s, 1920, 2002)),
-                    ("iyr", (s) => IsValidYear(s, 2010, 2020)),
-                    ("eyr", (s) => IsValidYear(s, 2020, 2030)),
-                    ("hgt", (s) => {
-                        int value;
-                        int.TryParse(s.Substring(0, s.Length-2), out value);
-                        string unit = s.Substring(s.Length-2, 2);
-                        return ((unit == "cm" && value >= 150 && value <= 193) || (unit == "in" && value >=59 && value<=76));
-                    }),
+                    ("byr", (s)=> Regex.IsMatch(s, @"^(19[2-8][0-9]|199[0-9]|200[0-2])$")),
+                    ("iyr", (s)=> Regex.IsMatch(s, @"^(201[0-9]|2020)$")),
+                    ("eyr", (s)=> Regex.IsMatch(s, @"^(202[0-9]|2030)$")),
+                    ("hgt", (s) => Regex.IsMatch(s, @"^(1[5-8][0-9]|19[0-3])cm$") || Regex.IsMatch(s, @"^(59|6[0-9]|7[0-6])in$")),                    
                     ("hcl", (s) => Regex.IsMatch(s, @"^\#[0-9a-f]{6}$")),
-                    ("ecl", (s) => new[] { "amb", "blu", "brn", "gry", "grn", "hzl", "oth"}.Contains(s)),
+                    ("ecl", (s) => Regex.IsMatch(s, @"^(amb|blu|brn|gry|grn|hzl|oth)$")),
                     ("pid", (s) => Regex.IsMatch(s, @"^[0-9]{9}$"))
                 }.Select((kv) => (dict.ContainsKey(kv.key) && (skipValidation || kv.validator(dict[kv.key])))).All((i)=>i);
             }).Count((b) => b);
