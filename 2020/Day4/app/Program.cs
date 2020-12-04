@@ -12,22 +12,20 @@ namespace app
         {            
             bool skipValidation = false; // true for part 1, false for part2
 
-            int nValid = ParseInput().Select( (passport) => {
+            Console.WriteLine(ParseInput().Select( (passport) => {
                 var dict = passport.Split(' ').Select(p=>p.Split(':')).ToDictionary(sp => sp[0], sp=>sp[1]);
                 
                 // Required keys and their validtors
-                return new (string key, Func<string, bool> validator)[] {
-                    ("byr", (s)=> Regex.IsMatch(s, @"^(19[2-8][0-9]|199[0-9]|200[0-2])$")),
-                    ("iyr", (s)=> Regex.IsMatch(s, @"^(201[0-9]|2020)$")),
-                    ("eyr", (s)=> Regex.IsMatch(s, @"^(202[0-9]|2030)$")),
-                    ("hgt", (s) => Regex.IsMatch(s, @"^(1[5-8][0-9]|19[0-3])cm$") || Regex.IsMatch(s, @"^(59|6[0-9]|7[0-6])in$")),                    
-                    ("hcl", (s) => Regex.IsMatch(s, @"^\#[0-9a-f]{6}$")),
-                    ("ecl", (s) => Regex.IsMatch(s, @"^(amb|blu|brn|gry|grn|hzl|oth)$")),
-                    ("pid", (s) => Regex.IsMatch(s, @"^[0-9]{9}$"))
-                }.Select((kv) => (dict.ContainsKey(kv.key) && (skipValidation || kv.validator(dict[kv.key])))).All((i)=>i);
-            }).Count((b) => b);
-
-            Console.WriteLine(nValid);
+                return new (string key, string re)[] {
+                    ("byr", @"^(19[2-8][0-9]|199[0-9]|200[0-2])$"),
+                    ("iyr", @"^(201[0-9]|2020)$"),
+                    ("eyr", @"^(202[0-9]|2030)$"),
+                    ("hgt", @"^(1[5-8][0-9]|19[0-3])cm$|^(59|6[0-9]|7[0-6])in$"),                    
+                    ("hcl", @"^\#[0-9a-f]{6}$"),
+                    ("ecl", @"^(amb|blu|brn|gry|grn|hzl|oth)$"),
+                    ("pid", @"^[0-9]{9}$")
+                }.Select((p) => (dict.ContainsKey(p.key) && (skipValidation || Regex.IsMatch(dict[p.key], p.re)))).All((i)=>i);
+            }).Count((b) => b));
         }
 
         static IEnumerable<string> ParseInput() {
