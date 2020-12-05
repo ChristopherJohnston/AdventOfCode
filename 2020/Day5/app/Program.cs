@@ -28,6 +28,8 @@ namespace app
 
         static void Main(string[] args)
         {
+            List<int> seatIDs = new List<int>();
+
             int maxId = 0;
             foreach (string ticket in ParseInput()) {
                 // string ticket = "FBFBBFFRLR";
@@ -38,9 +40,23 @@ namespace app
                 // Console.WriteLine("{0}: Row {1}, Seat {2}", ticket, row, seat);
                 int seatId = row * 8 + seat;
                 maxId = Math.Max(maxId, seatId);
+                seatIDs.Add(seatId);
             }
 
-            Console.WriteLine(maxId);
+            Console.WriteLine("Maximum Seat Id: {0}", maxId);
+
+            seatIDs.Sort();
+            int[] seats = seatIDs.ToArray();
+            int prevId = seats[0];
+
+            for (int i=1; i<seats.Length; i++) {
+                int seatId = seats[i];
+                if (seatId - prevId > 1) {
+                    Console.WriteLine("My Seat Id: {0}", prevId + 1);
+                    break;
+                }
+                prevId = seatId;
+            }
         }
         static IEnumerable<string> ParseInput() {
             string[] lines = File.ReadAllLines(@"input.txt");
