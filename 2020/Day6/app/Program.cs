@@ -10,7 +10,22 @@ namespace app
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(ParseInput().Select((p) => p.ToCharArray().Distinct().Count()).Sum());
+            Console.WriteLine(ParseInput().Select((p) => {
+                string[] answers = p.Split(' ');
+                Dictionary<char, int> m = new Dictionary<char, int>();
+                foreach (string answer in answers) {
+                    foreach (char a in answer.ToCharArray())
+                    {
+                        if (m.ContainsKey(a)) {
+                            m[a] += 1;
+                        }
+                        else {
+                            m[a] = 1;
+                        }
+                    }
+                }
+                return m.Count( (p) => p.Value == answers.Length );
+            }).Sum());
         }
 
         static IEnumerable<string> ParseInput() {
@@ -21,7 +36,7 @@ namespace app
                     yield return currentPassport.TrimEnd();
                     currentPassport = String.Empty;
                 } else {
-                    currentPassport += lines[i];
+                    currentPassport += lines[i] + " ";
                 }
             }            
         }
