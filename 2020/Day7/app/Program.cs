@@ -27,8 +27,11 @@ namespace app
                 }
                 rules[r[0]] = contents;
             }
-                
-            Console.WriteLine(rules.Keys.Count((colour) => CanContainBagColour(rules, colour, "shiny gold")));
+
+            string bagColour = "shiny gold";
+            Console.WriteLine(rules.Keys.Count((colour) => CanContainBagColour(rules, colour, bagColour)));
+
+            Console.WriteLine(CountBagsForBagColour(rules, bagColour));
         }
 
         static bool CanContainBagColour(Dictionary<string, Dictionary<string, int>> rules, string colour, string bagColour) {
@@ -43,6 +46,14 @@ namespace app
             }
 
             return false;
+        }
+
+        static int CountBagsForBagColour(Dictionary<string, Dictionary<string, int>> rules, string bagColour) {
+            int count = 0;
+            foreach (KeyValuePair<string, int> p in rules[bagColour]) {
+                count += p.Value * (1+CountBagsForBagColour(rules, p.Key));
+            }
+            return count;
         }
 
         static IEnumerable<string> ParseInput() {
