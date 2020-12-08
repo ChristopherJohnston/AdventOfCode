@@ -29,8 +29,11 @@ namespace app
             }
 
             string bagColour = "shiny gold";
+            // bool CanContainBagColour(string colour, string bagColour) => rules[colour].ContainsKey(bagColour) || rules[colour].Keys.Any((colour) => CanContain(colour, bagColour));
+            
             Console.WriteLine(rules.Keys.Count((colour) => CanContainBagColour(rules, colour, bagColour)));
 
+            // int CountBagsForBagColour(string colour) => rules[colour].Sum(p => p.Value * (1+CountBagsForBagColour(p.Key)));
             Console.WriteLine(CountBagsForBagColour(rules, bagColour));
         }
 
