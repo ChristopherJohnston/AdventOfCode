@@ -45,7 +45,8 @@ namespace app
                 program[i] = lastInstruction;
                 i++;
             }
-
+            
+            Console.WriteLine("{0}/{1} lines used", console.linesExecuted.Count, console.program.Length);
             Console.WriteLine(console.acc);
         }
         
