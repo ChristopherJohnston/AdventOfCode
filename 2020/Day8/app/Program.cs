@@ -19,39 +19,34 @@ namespace app
             
             // Part 2
             int i = 0;
-            string flippedInstruction = string.Empty;
+            string lastInstruction = string.Empty;
 
             while (!console.programFinished) {
-                // Revert any previously flipped instruction
-                if (flippedInstruction != string.Empty) {
-                    program[i] = flippedInstruction;
-                    i++;
+                // Flip the next instruction if necessary
+                lastInstruction = program[i];
+                string instruction = lastInstruction.Split(' ')[0];
+                if (instruction == "nop") {
+                    program[i] = lastInstruction.Replace("nop", "jmp");
                 }
-
-                // Find the next instruction to flip
-                bool altered = false;                
-                while (!altered) {
-                    flippedInstruction = program[i];
-                    string instruction = flippedInstruction.Split(' ')[0];
-                    if (instruction == "nop") {
-                        program[i] = flippedInstruction.Replace("nop", "jmp");
-                        altered = true;
-                    }
-                    else if (instruction == "jmp") {
-                        program[i] = flippedInstruction.Replace("jmp", "nop");
-                        altered = true;
-                    }
-                    else {
-                        i++;
-                    }
+                else if (instruction == "jmp") {
+                    program[i] = lastInstruction.Replace("jmp", "nop");
+                }
+                else {
+                    i++;
+                    continue;
                 }
                 
                 // Run the altered program
                 console.Reset();
                 console.program = program;
                 console.Boot();
-            }
 
+                // revert instruction
+                program[i] = lastInstruction;
+                i++;
+            }
+            
+            Console.WriteLine("{0}/{1} lines used", console.linesExecuted.Count, console.program.Length);
             Console.WriteLine(console.acc);
         }
         
