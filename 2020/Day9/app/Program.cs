@@ -7,7 +7,7 @@ namespace app
 {
     class Program
     {
-        static bool IsValidNumber(int value, List<int> preamble) {
+        static bool IsValidNumber(long value, List<long> preamble) {
             // find sum
             for (int j=0; j<24; j++) {
                 for (int k=j+1; k<25; k++) {
@@ -21,23 +21,44 @@ namespace app
 
         static void Main(string[] args)
         {
-            List<int> preamble = new List<int>();
+            List<long> preamble = new List<long>();
             int preambleLength = 25;
             int i = 0;
+            long? nonSummingValue = null;
 
-            foreach (string line in ParseInput()) {
-                int value = int.Parse(line);                
+            string[] input = ParseInput().ToArray();
+
+            foreach (string line in input) {
+                long value = long.Parse(line);                
             
                 if (i > preambleLength) {
                     preamble.RemoveAt(0);
                     if (!IsValidNumber(value, preamble)) {
                         Console.WriteLine(value);
-                        return;
+                        nonSummingValue = value;
+                        break;
                     }
                 }
                 
                 preamble.Add(value);
                 i++;
+            }
+
+            if (!nonSummingValue.HasValue) {
+                Console.WriteLine("No solution found for non-summing value.");
+            }
+
+            for (int l=4; l<input.Length; l++) {
+                for (int m=2; m<input.Length-5-m; m++) {
+                    long[] lastFive = input.Skip(l-4).Take(m).Select((s) => long.Parse(s)).ToArray();
+                    long x = lastFive.Sum();
+                
+                    if (x == nonSummingValue) {
+                        long result = lastFive.Min() + lastFive.Max();
+                        Console.WriteLine(result);
+                        return;
+                    }
+                }
             }
         }
 
