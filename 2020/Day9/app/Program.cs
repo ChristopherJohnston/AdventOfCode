@@ -26,11 +26,9 @@ namespace app
             int i = 0;
             long? nonSummingValue = null;
 
-            string[] input = ParseInput().ToArray();
+            long[] input = ParseInput().Select(s => long.Parse(s)).ToArray();
 
-            foreach (string line in input) {
-                long value = long.Parse(line);                
-            
+            foreach (long value in input) {            
                 if (i > preambleLength) {
                     preamble.RemoveAt(0);
                     if (!IsValidNumber(value, preamble)) {
@@ -50,7 +48,7 @@ namespace app
 
             for (int l=4; l<input.Length; l++) {
                 for (int m=2; m<input.Length-5-m; m++) {
-                    long[] contiguousNumbers = input.Skip(l-4).Take(m).Select((s) => long.Parse(s)).ToArray();
+                    long[] contiguousNumbers = input.Skip(l-4).Take(m).ToArray();
                     long x = contiguousNumbers.Sum();
                 
                     if (x == nonSummingValue) {
