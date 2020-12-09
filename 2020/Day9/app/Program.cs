@@ -50,11 +50,11 @@ namespace app
 
             for (int l=4; l<input.Length; l++) {
                 for (int m=2; m<input.Length-5-m; m++) {
-                    long[] lastFive = input.Skip(l-4).Take(m).Select((s) => long.Parse(s)).ToArray();
-                    long x = lastFive.Sum();
+                    long[] contiguousNumbers = input.Skip(l-4).Take(m).Select((s) => long.Parse(s)).ToArray();
+                    long x = contiguousNumbers.Sum();
                 
                     if (x == nonSummingValue) {
-                        long result = lastFive.Min() + lastFive.Max();
+                        long result = contiguousNumbers.Min() + contiguousNumbers.Max();
                         Console.WriteLine(result);
                         return;
                     }
