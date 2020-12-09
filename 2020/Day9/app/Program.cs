@@ -7,31 +7,31 @@ namespace app
 {
     class Program
     {
-        static bool IsValidNumber(long[] input, int start) {
-            // Find any 2 numbers in the  25 indices of the input array from the start index
-            // that sum to the 26th number.
-            long target = input[start+25];
-            for (int i=start; i<start+24; i++) {
-                for (int j=i+1; j<i+25; j++) {
-                    if (input[i] + input[j] == target) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
         static void Main(string[] args)
         {
             // Part 1 - Find a number that is not the sum of any 2 the previous 25
             long? nonSummingValue = null;
 
-            long[] input = ParseInput().Select(s => long.Parse(s)).ToArray();
+            long[] input = ParseInput().Select(long.Parse).ToArray();
+
+            Func<int, bool> CanFindSum = (int start) => {
+                // Find any 2 numbers in the  25 indices of the input array from the start index
+                // that sum to the 26th number.
+                long target = input[start+25];
+                for (int i=start; i<start+24; i++) {
+                    for (int j=i+1; j<i+25; j++) {
+                        if (input[i] + input[j] == target) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
 
             for (int i=0; i<input.Length-26; i++) {
-                if (!IsValidNumber(input, i)) {
+                if (!CanFindSum(i)) {
                     nonSummingValue = input[i+25];
-                    Console.WriteLine(nonSummingValue);
+                    Console.WriteLine(nonSummingValue); // 373803594
                     break;
                 }
             }
@@ -48,7 +48,7 @@ namespace app
                 
                     if (x == nonSummingValue) {
                         long result = contiguousNumbers.Min() + contiguousNumbers.Max();
-                        Console.WriteLine(result);
+                        Console.WriteLine(result); // 51152360
                         return;
                     }
                 }
