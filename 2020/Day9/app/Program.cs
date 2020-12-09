@@ -7,11 +7,12 @@ namespace app
 {
     class Program
     {
-        static bool IsValidNumber(long[] inputs) {
+        static bool IsValidNumber(long[] inputs, int start) {
             // find any 2 numbers in the numbers that sum to the last item
-            for (int j=0; j<24; j++) {
-                for (int k=j+1; k<25; k++) {
-                    if (inputs[j] + inputs[k] == inputs[25]) {
+            long target = inputs[start+25];
+            for (int i=start; i<start+24; i++) {
+                for (int j=i+1; j<i+25; j++) {
+                    if (inputs[i] + inputs[j] == target) {
                         return true;
                     }
                 }
@@ -27,10 +28,8 @@ namespace app
             long[] input = ParseInput().Select(s => long.Parse(s)).ToArray();
 
             for (int i=0; i<input.Length-26; i++) {
-                long[] numbers = input.Skip(i).Take(26).ToArray();
-
-                if (!IsValidNumber(numbers)) {
-                    nonSummingValue = numbers.Last();
+                if (!IsValidNumber(input, i)) {
+                    nonSummingValue = input[i+25];
                     Console.WriteLine(nonSummingValue);                    
                     break;
                 }                
