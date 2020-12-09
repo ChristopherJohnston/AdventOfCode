@@ -7,12 +7,13 @@ namespace app
 {
     class Program
     {
-        static bool IsValidNumber(long[] inputs, int start) {
-            // find any 2 numbers in the numbers that sum to the last item
-            long target = inputs[start+25];
+        static bool IsValidNumber(long[] input, int start) {
+            // Find any 2 numbers in the  25 indices of the input array from the start index
+            // that sum to the 26th number.
+            long target = input[start+25];
             for (int i=start; i<start+24; i++) {
                 for (int j=i+1; j<i+25; j++) {
-                    if (inputs[i] + inputs[j] == target) {
+                    if (input[i] + input[j] == target) {
                         return true;
                     }
                 }
@@ -30,9 +31,9 @@ namespace app
             for (int i=0; i<input.Length-26; i++) {
                 if (!IsValidNumber(input, i)) {
                     nonSummingValue = input[i+25];
-                    Console.WriteLine(nonSummingValue);                    
+                    Console.WriteLine(nonSummingValue);
                     break;
-                }                
+                }
             }
 
             if (!nonSummingValue.HasValue) {
