@@ -12,7 +12,7 @@ namespace app
             // Part 1 - Find a number that is not the sum of any 2 the previous 25
             long? nonSummingValue = null;
 
-            long[] input = ParseInput().Select(s => long.Parse(s)).ToArray();
+            long[] input = ParseInput().Select(long.Parse).ToArray();
 
             Func<int, bool> CanFindSum = (int start) => {
                 // Find any 2 numbers in the  25 indices of the input array from the start index
