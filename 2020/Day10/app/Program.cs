@@ -33,7 +33,7 @@ namespace app
 
         static void CountDifferences(List<int> input) {            
             int OneJolt = 0;
-            int ThreeJolt = 1; // built-in adapter is always 3-jolt differnce
+            int ThreeJolt = 1; // built-in adapter is always 3-jolt difference
             int previousJoltage = 0;
 
             foreach (int joltage in input) {
