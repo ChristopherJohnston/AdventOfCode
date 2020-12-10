@@ -12,11 +12,30 @@ namespace app
         {
             List<int> input = ParseInput().Select(int.Parse).ToList();
             input.Sort();
-            
+
+            CountDifferences(input);
+            CountArrangements(input);
+        }
+
+        static void CountArrangements(List<int> input){
+            Dictionary<int, long> arrangements = new Dictionary<int, long>();
+            arrangements[0] = 1;
+
+            foreach (int currentJoltage in input) {
+                arrangements[currentJoltage] = 0;
+                for (int i=1; i<4; i++) {
+                    if (arrangements.ContainsKey(currentJoltage-i))
+                        arrangements[currentJoltage] += arrangements[currentJoltage-i];
+                }
+            }
+            Console.WriteLine(arrangements[input.Last()]);
+        }
+
+        static void CountDifferences(List<int> input) {            
             int OneJolt = 0;
             int ThreeJolt = 1; // built-in adapter is always 3-jolt differnce
             int previousJoltage = 0;
-            
+
             foreach (int joltage in input) {
                 int difference = joltage - previousJoltage;
                 if (difference == 3) {
