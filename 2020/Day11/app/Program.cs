@@ -27,6 +27,18 @@ namespace app
             int numSeatsChanged = 1;
             int iterations = 0;
 
+            Func<string, bool> IsOccupied = (string s) => {
+                foreach (char c in s) {
+                    if (c == 'L') {
+                        return false;
+                    }
+                    if (c == '#') {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
             while (numSeatsChanged > 0) {
                 numSeatsChanged = 0;
                 string[] newInput = new string[input.Length];
@@ -40,20 +52,78 @@ namespace app
 
                         if (input[r][c] == '.') {
                             continue;
-                        }
+                        }                        
+
+                        string left = input[r].Substring(0, c);
                         
-                        for (int i=r-1; i<r+2; i++) {
-                            for (int j=c-1; j<c+2; j++) {
-                                if (i>=0 && i<input.Length && j>=0 && j<width && input[i][j] == '#') {
-                                    if (i==r && j==c) {
-                                        continue;
-                                    }
-                                    occupied++;
-                                }
-                            }
+                        string right = input[r].Substring(c+1);
+
+                        if (IsOccupied(new string(left.ToCharArray().Reverse().ToArray())))
+                            occupied++;
+                        
+                        if (IsOccupied(right))
+                            occupied++;
+
+                        string up = string.Empty;
+                        string down = string.Empty;
+                        for (int i=0; i<input.Length; i++) {
+                            if (i<r)
+                                up+=input[i][c];
+                            else if (i>r)
+                                down+=input[i][c];
                         }
 
-                        if (input[r][c] == '#' && occupied >= 4) {
+                        if (IsOccupied(new string(up.ToCharArray().Reverse().ToArray())))
+                            occupied++;
+                        
+                        if (IsOccupied(down))
+                            occupied++;                    
+                        
+                        string diagonalUpLeft = string.Empty;
+                        string diagonalUpRight = string.Empty;
+                        int j=c-1;
+                        int j2=c+1;
+                        for (int i=r-1; i>=0; i--) {
+                            if (j>=0) {
+                                diagonalUpLeft += input[i][j];
+                                j--;
+                            }
+
+                            if (j2 < width) {
+                                diagonalUpRight += input[i][j2];
+                                j2++;
+                            }                    
+                        }                        
+
+                        if (IsOccupied(diagonalUpLeft))
+                            occupied++;
+                        
+                        if (IsOccupied(diagonalUpRight))
+                            occupied++;
+                        
+                        string diagonalDownLeft = string.Empty;
+                        string diagonalDownRight = string.Empty;
+                        j = c-1;
+                        j2 = c+1;
+                        for (int i=r+1; i<input.Length; i++) {                        
+                            if (j>=0) {
+                                diagonalDownLeft += input[i][j];
+                                j--;
+                            }
+
+                            if (j2 < width) {
+                                diagonalDownRight += input[i][j2];
+                                j2++;
+                            }  
+                        }
+
+                        if (IsOccupied(diagonalDownLeft))
+                            occupied++;
+                        
+                        if (IsOccupied(diagonalDownRight))
+                            occupied++;
+
+                        if (input[r][c] == '#' && occupied >= 5) {
                             newInput[r] = newInput[r].Remove(c,1).Insert(c, "L");
                             numSeatsChanged++;
                         }
