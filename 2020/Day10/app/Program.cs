@@ -37,13 +37,10 @@ namespace app
             int previousJoltage = 0;
 
             foreach (int joltage in input) {
-                int difference = joltage - previousJoltage;
-                if (difference == 3) {
+                if (joltage - previousJoltage == 3)
                     ThreeJolt++;
-                }
-                else {
+                else
                     OneJolt++;
-                }
 
                 previousJoltage = joltage;
             }
