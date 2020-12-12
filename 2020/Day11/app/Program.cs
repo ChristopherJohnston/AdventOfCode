@@ -48,80 +48,60 @@ namespace app
                     int width = input[r].Length;
 
                     for (int c=0; c<width; c++) {
-                        int occupied = 0;
-
                         if (input[r][c] == '.') {
                             continue;
-                        }                        
-
-                        string left = input[r].Substring(0, c);
+                        }
                         
-                        string right = input[r].Substring(c+1);
-
-                        if (IsOccupied(new string(left.ToCharArray().Reverse().ToArray())))
-                            occupied++;
-                        
-                        if (IsOccupied(right))
-                            occupied++;
-
-                        string up = string.Empty;
-                        string down = string.Empty;
-                        for (int i=0; i<input.Length; i++) {
-                            if (i<r)
-                                up+=input[i][c];
-                            else if (i>r)
-                                down+=input[i][c];
+                        string[] seats = new string[8];
+                        for (int i=0; i<8;i++) {
+                            seats[i] = string.Empty;
                         }
 
-                        if (IsOccupied(new string(up.ToCharArray().Reverse().ToArray())))
-                            occupied++;
+                        // Left and Right
+                        seats[0] = new string(input[r].Substring(0, c).ToCharArray().Reverse().ToArray());
+                        seats[1] = input[r].Substring(c+1);
+
+                        // Up and down
+                        for (int i=0; i<input.Length; i++) {
+                            if (i<r)
+                                seats[2]+=input[i][c];
+                            else if (i>r)
+                                seats[3]+=input[i][c];
+                        }
+
+                        seats[2] = new string(seats[2].ToCharArray().Reverse().ToArray());
                         
-                        if (IsOccupied(down))
-                            occupied++;                    
-                        
-                        string diagonalUpLeft = string.Empty;
-                        string diagonalUpRight = string.Empty;
-                        int j=c-1;
-                        int j2=c+1;
+                        // Diagonals up
+                        int left=c-1;
+                        int right=c+1;
                         for (int i=r-1; i>=0; i--) {
-                            if (j>=0) {
-                                diagonalUpLeft += input[i][j];
-                                j--;
+                            if (left>=0) {
+                                seats[4] += input[i][left];
+                                left--;
                             }
 
-                            if (j2 < width) {
-                                diagonalUpRight += input[i][j2];
-                                j2++;
+                            if (right < width) {
+                                seats[5] += input[i][right];
+                                right++;
                             }                    
-                        }                        
+                        }
 
-                        if (IsOccupied(diagonalUpLeft))
-                            occupied++;
-                        
-                        if (IsOccupied(diagonalUpRight))
-                            occupied++;
-                        
-                        string diagonalDownLeft = string.Empty;
-                        string diagonalDownRight = string.Empty;
-                        j = c-1;
-                        j2 = c+1;
+                        // Diagonals down
+                        left = c-1;
+                        right = c+1;
                         for (int i=r+1; i<input.Length; i++) {                        
-                            if (j>=0) {
-                                diagonalDownLeft += input[i][j];
-                                j--;
+                            if (left>=0) {
+                                seats[6] += input[i][left];
+                                left--;
                             }
 
-                            if (j2 < width) {
-                                diagonalDownRight += input[i][j2];
-                                j2++;
+                            if (right < width) {
+                                seats[7] += input[i][right];
+                                right++;
                             }  
                         }
 
-                        if (IsOccupied(diagonalDownLeft))
-                            occupied++;
-                        
-                        if (IsOccupied(diagonalDownRight))
-                            occupied++;
+                        int occupied = seats.Count((s) => IsOccupied(s));
 
                         if (input[r][c] == '#' && occupied >= 5) {
                             newInput[r] = newInput[r].Remove(c,1).Insert(c, "L");
