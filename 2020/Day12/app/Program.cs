@@ -93,8 +93,8 @@ namespace app
          }
 
         static IEnumerable<string> ParseInput() {
-            string[] lines = File.ReadAllLines(@"input.txt");
-            // string[] lines = new string[] { "F10", "N3", "F7", "R90", "F11" };
+            string[] lines = File.ReadAllLines(@"input.txt"); // = Part1: 858, Part2: 39140
+            // string[] lines = new string[] { "F10", "N3", "F7", "R90", "F11" }; // = Part1: 25, Part2: 286
             foreach (string line in lines) {
                 yield return line;
             }            
