@@ -19,6 +19,7 @@ namespace app
                 Match match = Regex.Match(instruction, @"^([A-Z])([0-9]+)");
                 string action = match.Groups[1].Value;
                 int value = int.Parse(match.Groups[2].Value);
+                int e = waypointEast;
 
                 switch (action) {
                     case "N":
@@ -36,7 +37,6 @@ namespace app
                     case "L":
                         switch (value) {
                             case 90:
-                                int e = waypointEast;
                                 waypointEast = -waypointNorth;
                                 waypointNorth = e;
                                 break;
@@ -45,7 +45,6 @@ namespace app
                                 waypointNorth *= -1;                                
                                 break;
                             case 270:
-                                e = waypointEast;
                                 waypointEast = waypointNorth;
                                 waypointNorth = -e;                            
                                 break;
@@ -59,7 +58,6 @@ namespace app
                     case "R":
                         switch (value) {
                             case 90:
-                                int e = waypointEast;
                                 waypointEast = waypointNorth;
                                 waypointNorth = -e;
                                 break;
@@ -68,7 +66,6 @@ namespace app
                                 waypointNorth *= -1;                                
                                 break;
                             case 270:
-                                e = waypointEast;
                                 waypointEast = -waypointNorth;
                                 waypointNorth = e;
                                 break;
