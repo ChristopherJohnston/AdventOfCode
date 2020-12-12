@@ -10,9 +10,10 @@ namespace app
     {
         static void Main(string[] args)
         {
-            int currentDirection = 90;
             int east = 0;
             int north = 0;
+            int waypointEast = 10;
+            int waypointNorth = 1;
 
             foreach (string instruction in ParseInput()) {
                 Match match = Regex.Match(instruction, @"^([A-Z])([0-9]+)");
@@ -21,47 +22,66 @@ namespace app
 
                 switch (action) {
                     case "N":
-                        north += value;
+                        waypointNorth += value;
                         break;                        
                     case "S":
-                        north -= value;
+                        waypointNorth -= value;
                         break;
                     case "E":
-                        east += value;
+                        waypointEast += value;
                         break;
                     case "W":
-                        east -= value;
+                        waypointEast -= value;
                         break;
                     case "L":
-                        currentDirection -= value;
-                        if (currentDirection<0) {
-                            currentDirection = 360 + currentDirection;
+                        switch (value) {
+                            case 90:
+                                int e = waypointEast;
+                                waypointEast = -waypointNorth;
+                                waypointNorth = e;
+                                break;
+                            case 180:
+                                waypointEast *= -1;
+                                waypointNorth *= -1;                                
+                                break;
+                            case 270:
+                                e = waypointEast;
+                                waypointEast = waypointNorth;
+                                waypointNorth = -e;                            
+                                break;
+                            case 360:
+                                break;
+                            default:
+                                Console.WriteLine("Unknown direction {0}", value);
+                                break;
                         }
                         break;
                     case "R":
-                        currentDirection += value;
-                        if (currentDirection > 359) {
-                            currentDirection = currentDirection - 360;
+                        switch (value) {
+                            case 90:
+                                int e = waypointEast;
+                                waypointEast = waypointNorth;
+                                waypointNorth = -e;
+                                break;
+                            case 180:
+                                waypointEast *= -1;
+                                waypointNorth *= -1;                                
+                                break;
+                            case 270:
+                                e = waypointEast;
+                                waypointEast = -waypointNorth;
+                                waypointNorth = e;
+                                break;
+                            case 360:
+                                break;
+                            default:
+                                Console.WriteLine("Unknown direction {0}", value);
+                                break;
                         }
                         break;
                     case "F":
-                        switch (currentDirection) {
-                            case 90:
-                                east += value;
-                                break;
-                            case 180:
-                                north -= value;
-                                break;
-                            case 270:
-                                east -= value;
-                                break;
-                            case 0:
-                                north += value;
-                                break;
-                            default:
-                                Console.WriteLine("Unknown direction {0}", currentDirection);
-                                break;
-                        }
+                        east += (waypointEast * value);
+                        north += (waypointNorth * value);
                         break;
                     default:
                         Console.WriteLine("Unknown action {0}", action);
@@ -73,9 +93,11 @@ namespace app
          }
 
         static IEnumerable<string> ParseInput() {
-            foreach (string line in File.ReadAllLines(@"input.txt")) {
+            string[] lines = File.ReadAllLines(@"input.txt");
+            // string[] lines = new string[] { "F10", "N3", "F7", "R90", "F11" };
+            foreach (string line in lines) {
                 yield return line;
-            }
+            }            
         }
     }
 }
