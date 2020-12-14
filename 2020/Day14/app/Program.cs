@@ -46,7 +46,7 @@ namespace app
                 }
             }
 
-            Console.WriteLine(memory.Sum((kv) => kv.Value));
+            Console.WriteLine(memory.Sum((kv) => kv.Value)); // 4877695371685
         }
 
         static void Part1() {
@@ -58,25 +58,23 @@ namespace app
                     mask = Regex.Match(command, @"^mask = (.*)$").Groups[1].Value;
                 } else if (command.Contains("mem")) {
                     Match m = Regex.Match(command, @"^mem\[(\d+)\] = (\d+)$");
-                    long key = long.Parse(m.Groups[1].Value);
-                    long value = long.Parse(m.Groups[2].Value);
-                    string bits = Convert.ToString(value, 2);
-                    string newBits = String.Empty;
+                    string value = Convert.ToString(long.Parse(m.Groups[2].Value), 2);
+                    string newValue = String.Empty;
                     for (int i=0; i<mask.Length; i++) {
-                        if (mask[i] == 'X' && (i+bits.Length-36 >=0)) {
-                            newBits += bits[i+bits.Length-36];
+                        if (mask[i] == 'X' && (i+value.Length-36 >=0)) {
+                            newValue += value[i+value.Length-36];
                         } else if (mask[i] == 'X') {
-                            newBits += '0';
+                            newValue += '0';
                         }
                         else {
-                            newBits += mask[i];
+                            newValue += mask[i];
                         }
                     }
-                    memory[key] = Convert.ToInt64(newBits, 2);
+                    memory[long.Parse(m.Groups[1].Value)] = Convert.ToInt64(newValue, 2);
                 }
             }
 
-            Console.WriteLine(memory.Sum((kv) => kv.Value));
+            Console.WriteLine(memory.Sum((kv) => kv.Value)); // 9296748256641
         }
 
         static IEnumerable<string> ParseInput() {
