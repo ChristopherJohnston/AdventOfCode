@@ -15,7 +15,7 @@ namespace app
         }
 
         static void Part2() {
-            string mask = "";
+            string mask = string.Empty;
             Dictionary<long, long> memory = new Dictionary<long, long>();
 
             foreach (string command in ParseInput()) {
@@ -23,43 +23,30 @@ namespace app
                     mask = Regex.Match(command, @"^mask = (.*)$").Groups[1].Value;
                 } else if (command.Contains("mem")) {
                     Match m = Regex.Match(command, @"^mem\[(\d+)\] = (\d+)$");
-                    long key = long.Parse(m.Groups[1].Value);
-                    long value = long.Parse(m.Groups[2].Value);
-
-                    string bits = Convert.ToString(key, 2);
-                    List<string> newBits = new List<string>() { String.Empty };
+                    string currentKey = Convert.ToString(long.Parse(m.Groups[1].Value), 2);
+                    List<string> keys = new List<string>() { String.Empty };
 
                     for (int i=0; i<mask.Length; i++) {
-                        switch (mask[i]) {
-                            case '1':
-                                for (int j=0; j<newBits.Count; j++) {
-                                    newBits[j] += '1';
-                                }                                
-                                break;
-                            case '0':
-                                for (int j=0; j<newBits.Count; j++) {
-                                    newBits[j] += (i+bits.Length-36 >=0) ? bits[i+bits.Length-36] : '0';
-                                }
-                                break;
-                            case 'X':
-                            default:
-                                List<string> nb = new List<string>();
-                                for (int j=0; j<newBits.Count; j++) {
-                                    nb.Add(newBits[j] + "1");
-                                    newBits[j] += '0';
-                                }
-                                newBits.AddRange(nb);
-                                break;
+                        if (mask[i] == 'X') {
+                            List<string> nb = new List<string>();
+                            for (int j=0; j<keys.Count; j++) {
+                                nb.Add(keys[j] + '1');
+                                keys[j] += '0';
+                            }
+                            keys.AddRange(nb);
+                        } else {
+                            int offset = currentKey.Length-mask.Length;
+                            for (int j=0; j<keys.Count; j++) {
+                                keys[j] += (mask[i] == '0' && (i+offset >=0)) ? currentKey[i+offset] : mask[i];
+                            }
                         }
                     }
                     
-                    foreach (string n in newBits) {
-                        memory[Convert.ToInt64(n, 2)] = value;
-                    }
+                    keys.ForEach((k) => memory[Convert.ToInt64(k, 2)] = long.Parse(m.Groups[2].Value));
                 }
             }
 
-            Console.WriteLine(memory.Sum((kv) => kv.Value));
+            Console.WriteLine(memory.Sum((kv) => kv.Value)); // 4877695371685
         }
 
         static void Part1() {
@@ -71,35 +58,23 @@ namespace app
                     mask = Regex.Match(command, @"^mask = (.*)$").Groups[1].Value;
                 } else if (command.Contains("mem")) {
                     Match m = Regex.Match(command, @"^mem\[(\d+)\] = (\d+)$");
-                    long key = long.Parse(m.Groups[1].Value);
-                    long value = long.Parse(m.Groups[2].Value);
-                    string bits = Convert.ToString(value, 2);
-                    string newBits = String.Empty;
+                    string value = Convert.ToString(long.Parse(m.Groups[2].Value), 2);
+                    string newValue = String.Empty;
                     for (int i=0; i<mask.Length; i++) {
-                        switch (mask[i]) {
-                            case '1':
-                                newBits += '1';
-                                break;
-                            case '0':
-                                newBits += '0';
-                                break;
-                            case 'X':
-                            default:
-                                if (i+bits.Length-36 >=0) {
-                                    newBits += bits[i+bits.Length-36];
-                                }
-                                else {
-                                    newBits += '0';
-                                }
-                                
-                                break;
+                        if (mask[i] == 'X' && (i+value.Length-36 >=0)) {
+                            newValue += value[i+value.Length-36];
+                        } else if (mask[i] == 'X') {
+                            newValue += '0';
+                        }
+                        else {
+                            newValue += mask[i];
                         }
                     }
-                    memory[key] = Convert.ToInt64(newBits, 2);
+                    memory[long.Parse(m.Groups[1].Value)] = Convert.ToInt64(newValue, 2);
                 }
             }
 
-            Console.WriteLine(memory.Sum((kv) => kv.Value));
+            Console.WriteLine(memory.Sum((kv) => kv.Value)); // 9296748256641
         }
 
         static IEnumerable<string> ParseInput() {
