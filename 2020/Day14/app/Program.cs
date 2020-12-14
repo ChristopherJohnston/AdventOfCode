@@ -76,23 +76,13 @@ namespace app
                     string bits = Convert.ToString(value, 2);
                     string newBits = String.Empty;
                     for (int i=0; i<mask.Length; i++) {
-                        switch (mask[i]) {
-                            case '1':
-                                newBits += '1';
-                                break;
-                            case '0':
-                                newBits += '0';
-                                break;
-                            case 'X':
-                            default:
-                                if (i+bits.Length-36 >=0) {
-                                    newBits += bits[i+bits.Length-36];
-                                }
-                                else {
-                                    newBits += '0';
-                                }
-                                
-                                break;
+                        if (mask[i] == 'X' && (i+bits.Length-36 >=0)) {
+                            newBits += bits[i+bits.Length-36];
+                        } else if (mask[i] == 'X') {
+                            newBits += '0';
+                        }
+                        else {
+                            newBits += mask[i];
                         }
                     }
                     memory[key] = Convert.ToInt64(newBits, 2);
