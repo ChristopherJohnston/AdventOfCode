@@ -29,53 +29,59 @@ namespace app
             ..# ..# ..#
             ### ### ###
             */
-            Dictionary<(long,long,long), char> initialState = new Dictionary<(long, long, long), char>();
+            Dictionary<(long,long,long, long), char> initialState = new Dictionary<(long, long, long, long), char>();
             string[] lines = File.ReadAllLines(@"input.txt");
             for (int y=0; y<lines.Length; y++) {
                 for (int x=0; x<lines[y].Length; x++) {
-                    initialState[(x,y,0)] = lines[y][x];
+                    initialState[(x,y,0,0)] = lines[y][x];
                 }
             }
 
             Part1(initialState);
         }
 
-        static void Part1(Dictionary<(long,long,long), char> state) {
+        static void Part1(Dictionary<(long,long,long, long), char> state) {
             int minX = 0;
             int maxX = 7;
             int minY = 0;
             int maxY = 7;
             int minZ = 0;
             int maxZ = 0;
+            int minW = 0;
+            int maxW = 0;
 
             for (int i=0; i<6; i++) {
-                Dictionary<(long x,long y,long z), char> newState = new Dictionary<(long, long, long), char>();
+                Dictionary<(long x,long y,long z, long w), char> newState = new Dictionary<(long, long, long, long), char>();
 
                 // Go through the existing items
                 for (int x=minX-1; x<=maxX+1; x++) {
                     for (int y=minY-1; y<=maxY+1; y++) {
                         for (int z=minZ-1; z<=maxZ+1; z++) {
-                            long activeNeighbours = 0;
+                            for (int w=minW-1; w<=maxW+1; w++) {
+                                long activeNeighbours = 0;
 
-                            // check around current item
-                            for (int x1=x-1; x1<=x+1; x1++) {
-                                for (int y1=y-1; y1<=y+1; y1++) {
-                                    for (int z1=z-1; z1<=z+1; z1++) {
-                                        if ((x,y,z) == (x1,y1,z1)) {
-                                            // don't check the current item
-                                            continue;
+                                // check around current item
+                                for (int x1=x-1; x1<=x+1; x1++) {
+                                    for (int y1=y-1; y1<=y+1; y1++) {
+                                        for (int z1=z-1; z1<=z+1; z1++) {
+                                            for (int w1=w-1; w1<=w+1; w1++) {
+                                                if ((x,y,z,w) == (x1,y1,z1,w1)) {
+                                                    // don't check the current item
+                                                    continue;
+                                                }
+
+                                                if (state.ContainsKey((x1,y1,z1,w1)) && state[(x1,y1,z1,w1)] == '#')
+                                                    activeNeighbours++;
+                                            }
                                         }
-
-                                        if (state.ContainsKey((x1,y1,z1)) && state[(x1,y1,z1)] == '#')
-                                            activeNeighbours++;
                                     }
                                 }
-                            }
 
-                            if (state.ContainsKey((x,y,z)) && state[(x,y,z)] == '#') {
-                                newState[(x,y,z)] = (activeNeighbours == 2 || activeNeighbours == 3) ? '#' : '.';
-                            } else {
-                                newState[(x,y,z)] = (activeNeighbours == 3) ? '#': '.';
+                                if (state.ContainsKey((x,y,z,w)) && state[(x,y,z,w)] == '#') {
+                                    newState[(x,y,z,w)] = (activeNeighbours == 2 || activeNeighbours == 3) ? '#' : '.';
+                                } else {
+                                    newState[(x,y,z,w)] = (activeNeighbours == 3) ? '#': '.';
+                                }
                             }
                         }
                     }
@@ -87,6 +93,8 @@ namespace app
                 maxY++;
                 minZ--;
                 maxZ++;
+                minW--;
+                maxW++;
                 state = newState;        
             }
 
@@ -94,7 +102,9 @@ namespace app
                 Console.WriteLine("Z={0}", z2);
                 for (int y2=minY; y2<=maxY; y2++) {
                     for (int x2=minX; x2<=maxX; x2++ ) {
-                        Console.Write(state[(x2,y2,z2)]);
+                        for (int w2=minW; w2<=maxW; w2++ ) {
+                            Console.Write(state[(x2,y2,z2,w2)]);
+                        }
                     }
                     Console.WriteLine();
                 }
