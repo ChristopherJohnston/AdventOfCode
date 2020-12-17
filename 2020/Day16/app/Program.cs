@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 struct Notes {
     public Dictionary<string, string> Rules;
     public int[] MyTicket;
-
     public List<int[]> NearbyTickets;
 }
 
@@ -25,10 +24,10 @@ namespace app
         static void Part2(Notes n, List<int[]> validTickets) {
             validTickets.Add(n.MyTicket);
             Dictionary<string, List<int>> fieldCandidates = new Dictionary<string, List<int>>();
+            string[] fields = new string[n.Rules.Count];
 
             foreach (KeyValuePair<string, string> kv in n.Rules) {
-                Match m = Regex.Match(kv.Value, @"(\d+)-(\d+) or (\d+)-(\d+)");
-                int[] rule = m.Groups.Values.Skip(1).Select((g) => int.Parse(g.Value)).ToArray();
+                int[] rule = Regex.Match(kv.Value, @"(\d+)-(\d+) or (\d+)-(\d+)").Groups.Values.Skip(1).Select((g) => int.Parse(g.Value)).ToArray();
 
                 for (int i=0; i<n.Rules.Count; i++) {
                     if (validTickets.All((t) => ((t[i] >= rule[0] && t[i] <= rule[1]) || (t[i] >= rule[2] && t[i] <= rule[3])))) {
@@ -41,22 +40,13 @@ namespace app
                 }
             }
 
-            string[] fields = new string[n.Rules.Count];
-
-            // Solve the indices by finding the fields that only have one index and removing that index
-            // from the rest of the fields until there are none left to find.
-            while (fields.Any((v) => v == null)) {
-                foreach (KeyValuePair<string, List<int>> fc in fieldCandidates) {
-                    if (fc.Value.Count == 1) {
-                        fields[fc.Value[0]] = fc.Key;
-
-                        // Remove the index from the rest of the field candidates
-                        foreach (KeyValuePair<string, List<int>> fc2 in fieldCandidates) {
-                            if (fc2.Key != fc.Key)
-                                fc2.Value.Remove(fc.Value[0]);         
-                        }
-                        // Remove the candidate
-                        fieldCandidates.Remove(fc.Key);
+            var x = fieldCandidates.ToList();
+            x.Sort((x,y) => x.Value.Count - y.Value.Count);
+            foreach (KeyValuePair<string, List<int>> fc in x) {
+                foreach (int idx in fc.Value) {
+                    if (fields[idx] == null) {
+                        fields[idx] = fc.Key;
+                        break;
                     }
                 }
             }
@@ -75,7 +65,6 @@ namespace app
             foreach (string v in n.Rules.Values) {
                 Match m = Regex.Match(v, @"(\d+)-(\d+) or (\d+)-(\d+)");
                 int[] rule = m.Groups.Values.Skip(1).Select((g) => int.Parse(g.Value)).ToArray();
-
 
                 for (int i=rule[0]; i<=rule[1]; i++) {
                     allValidNumbers.Add(i);
