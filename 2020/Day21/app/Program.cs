@@ -15,7 +15,7 @@ namespace app
 
             foreach (string food in ParseInput()) {
                 Match m = Regex.Match(food, @"(.*) \(contains (.*)\)");
-                var ingredients = m.Groups[1].Value.Split(' ');
+                var ingredients = m.Groups[1].Value.Split(' ').ToHashSet();
                 var allergens = m.Groups[2].Value.Split(", ");
 
                 foreach (string ingredient in ingredients) {
@@ -23,16 +23,7 @@ namespace app
                 }
 
                 foreach (string allergen in allergens) {
-                    if (!allergenIngredients.ContainsKey(allergen))
-                        allergenIngredients[allergen] = ingredients.ToHashSet();
-                    else {
-                        // Remove anything from the allergen's existing ingredients
-                        // that aren't in the current food's ingredients
-                        foreach (string ingredient in allergenIngredients[allergen]) {
-                            if (!ingredients.Contains(ingredient))
-                                allergenIngredients[allergen].Remove(ingredient);
-                        }
-                    }
+                    allergenIngredients[allergen] = (allergenIngredients.ContainsKey(allergen)) ? allergenIngredients[allergen].Intersect(ingredients).ToHashSet() : ingredients;
                 }
             }
 
