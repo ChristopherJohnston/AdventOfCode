@@ -41,8 +41,28 @@ namespace app
                 ingredientsContainingAllergens.AddRange(kv.Value.ToList());
             }
 
-            // Count ingredients that aren't in any allergens
-            Console.WriteLine(allIngredients.Count(c => !ingredientsContainingAllergens.Contains(c)));            
+            // Part 1: Count ingredients that aren't in any allergens
+            Console.WriteLine(allIngredients.Count(c => !ingredientsContainingAllergens.Contains(c)));
+
+            // Part 2: List dangerous ingredients by alphabetical allergen
+            Dictionary<string, string> allergenIngredient = new Dictionary<string, string>();
+            HashSet<string> ica = ingredientsContainingAllergens.ToHashSet();
+            // Solve the by finding the allergens that only have one ingredient and removing that ingredient
+            // from the rest of the allergens until there are none left to find.
+            while (ica.Count > 0) {
+                foreach (var kv in allergenIngredients.OrderBy(kv => kv.Value.Count)) {                    
+                    var ingredient = kv.Value.ToList()[0];
+                    allergenIngredient[kv.Key] = ingredient;
+
+                    foreach (var kv2 in allergenIngredients) {
+                        kv2.Value.Remove(ingredient);
+                    }
+
+                    ica.Remove(ingredient);
+                }
+            }
+
+            Console.WriteLine(string.Join(",", allergenIngredient.OrderBy(kv => kv.Key).Select(kv => kv.Value)));
         }
 
         static IEnumerable<string> ParseInput() {
