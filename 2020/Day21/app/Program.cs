@@ -15,7 +15,7 @@ namespace app
 
             foreach (string food in ParseInput()) {
                 Match m = Regex.Match(food, @"(.*) \(contains (.*)\)");
-                var ingredients = m.Groups[1].Value.Split(' ');
+                var ingredients = m.Groups[1].Value.Split(' ').ToHashSet();
                 var allergens = m.Groups[2].Value.Split(", ");
 
                 foreach (string ingredient in ingredients) {
@@ -23,34 +23,23 @@ namespace app
                 }
 
                 foreach (string allergen in allergens) {
-                    if (!allergenIngredients.ContainsKey(allergen))
-                        allergenIngredients[allergen] = ingredients.ToHashSet();
-                    else {
-                        // Remove anything from the allergen's existing ingredients
-                        // that aren't in the current food's ingredients
-                        foreach (string ingredient in allergenIngredients[allergen]) {
-                            if (!ingredients.Contains(ingredient))
-                                allergenIngredients[allergen].RemoveWhere((i) => i == ingredient);
-                        }
-                    }
+                    allergenIngredients[allergen] = (allergenIngredients.ContainsKey(allergen)) ? allergenIngredients[allergen].Intersect(ingredients).ToHashSet() : ingredients;
                 }
             }
 
-            List<string> ingredientsContainingAllergens = new List<string>();
-            foreach (KeyValuePair<string, HashSet<string>> kv in allergenIngredients) {
-                ingredientsContainingAllergens.AddRange(kv.Value.ToList());
-            }
+            HashSet<string> ingredientsContainingAllergens = allergenIngredients.SelectMany(c=>c.Value).ToHashSet();
 
             // Part 1: Count ingredients that aren't in any allergens
             Console.WriteLine(allIngredients.Count(c => !ingredientsContainingAllergens.Contains(c)));
 
             // Part 2: List dangerous ingredients by alphabetical allergen
             Dictionary<string, string> allergenIngredient = new Dictionary<string, string>();
-            HashSet<string> ica = ingredientsContainingAllergens.ToHashSet();
+
             // Solve the by finding the allergens that only have one ingredient and removing that ingredient
-            // from the rest of the allergens until there are none left to find.
-            while (ica.Count > 0) {
-                foreach (var kv in allergenIngredients.OrderBy(kv => kv.Value.Count)) {                    
+            // from the rest of the allergens until there are none left to find.            
+            while (ingredientsContainingAllergens.Count > 0) {
+                foreach (var kv in allergenIngredients.OrderBy(kv => kv.Value.Count)) {
+                    // The first item in the dictionary should always contain a single value
                     var ingredient = kv.Value.ToList()[0];
                     allergenIngredient[kv.Key] = ingredient;
 
@@ -58,7 +47,7 @@ namespace app
                         kv2.Value.Remove(ingredient);
                     }
 
-                    ica.Remove(ingredient);
+                    ingredientsContainingAllergens.Remove(ingredient);
                 }
             }
 
@@ -66,7 +55,7 @@ namespace app
         }
 
         static IEnumerable<string> ParseInput() {
-            foreach (string line in File.ReadAllLines(@"input.txt")) {
+            foreach (string line in File.ReadAllLines(@"example.txt")) {
                 yield return line;
             }
         }
