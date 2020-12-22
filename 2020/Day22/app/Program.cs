@@ -47,7 +47,7 @@ namespace app
                     // start sub game if all players have at least the same number of cards in their deck as the current card value
                     List<Queue<int>> newPlayers = new List<Queue<int>>();
                     for (int i=0; i<players.Count; i++) {
-                        newPlayers.Add(new Queue<int>(players[i].ToArray().Take(currentRoundCards[i])));
+                        newPlayers.Add(new Queue<int>(players[i].Take(currentRoundCards[i])));
                     }
                     winningPlayer = Part2(newPlayers);
                 } else {
@@ -62,18 +62,14 @@ namespace app
 
             // Count scores
             for (int i=0; i<players.Count; i++) {
-                Queue<int> currentPlayer = players[i];
-                if (currentPlayer.Count != 0) {
-                    long score = 0;
-                    for (int multiplier=currentPlayer.Count; multiplier>0; multiplier--) {
-                        score += currentPlayer.Dequeue() * multiplier;
-                    }
-
+                Queue<int> winner = players[i];
+                if (winner.Count != 0) {
                     if (game == 1) {
-                        Console.WriteLine("The winner of game {0} is player {1} with score {2}. Deck: {3}", game, i+1, score, string.Join(',',currentPlayer.ToArray()));
+                        long score = winner.Select((c, i) => (winner.Count-i) * c).Sum();
+                        Console.WriteLine("The winner of game {0} is player {1} with score {2}. Deck: {3}", game, i+1, score, string.Join(',', winner.ToArray()));
                     }
                     return i;
-                }                
+                }
             }
 
             // Should never get here
