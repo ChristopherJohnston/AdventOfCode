@@ -22,6 +22,11 @@ namespace app
 
             // Part1(players);
             Part2(players);
+            
+            // Count scores
+            for (int n=0; n<players.Count; n++) {
+                Console.WriteLine("Player {0} score: {1}", n+1, players[n].Select((c, i) => (players[n].Count-i) * c).Sum());
+            }
             Console.WriteLine("Total Games: {0}", gameCount);
         }
 
@@ -62,12 +67,7 @@ namespace app
 
             // Count scores
             for (int i=0; i<players.Count; i++) {
-                Queue<int> winner = players[i];
-                if (winner.Count != 0) {
-                    if (game == 1) {
-                        long score = winner.Select((c, i) => (winner.Count-i) * c).Sum();
-                        Console.WriteLine("The winner of game {0} is player {1} with score {2}. Deck: {3}", game, i+1, score, string.Join(',', winner.ToArray()));
-                    }
+                if (players[i].Count != 0) {
                     return i;
                 }
             }
@@ -83,11 +83,6 @@ namespace app
                 var currentRoundCards = players.Select((p) => p.Dequeue()).ToList();
                 int winningPlayer = currentRoundCards.IndexOf(currentRoundCards.Max());
                 currentRoundCards.OrderBy((v) => v).Reverse().ToList().ForEach(c=> players[winningPlayer].Enqueue(c));
-            }
-
-            // Count scores
-            for (int i=0; i<players.Count; i++) {
-                Console.WriteLine("Player {0} score: {1}", i+1, players[i].Select((c, i) => (players[i].Count-i) * c).Sum());
             }
         }
 
