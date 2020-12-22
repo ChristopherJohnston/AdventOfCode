@@ -9,7 +9,7 @@ namespace app
     public static class StringExtensions {
         public static string Reversed(this String str) {
             char[] c = str.ToCharArray();
-            c.Reverse();
+            Array.Reverse(c);
             return new string(c);
         }
     }
@@ -18,15 +18,18 @@ namespace app
     {
         static void Main(string[] args)
         {
-            Dictionary<string, long> tops = new Dictionary<string, long>();
-            Dictionary<string, long> bottoms = new Dictionary<string, long>();
-            Dictionary<string, long> lefts = new Dictionary<string, long>();
-            Dictionary<string, long> rights = new Dictionary<string, long>();
+            Dictionary<long, string> tops = new Dictionary<long, string>();
+            Dictionary<long, string> bottoms = new Dictionary<long, string>();
+            Dictionary<long, string> lefts = new Dictionary<long, string>();
+            Dictionary<long, string> rights = new Dictionary<long, string>();
+            Dictionary<long, string[]> tiles = new Dictionary<long, string[]>();
 
             foreach (string[] tile in ParseInput()) {
                 long tileNumber = long.Parse(Regex.Match(tile[0], @"Tile ([0-9]+)").Groups[1].Value);
-                tops[tile[1]] = tileNumber;
-                bottoms[tile[^1]] = tileNumber;
+                tiles[tileNumber] = tile.Skip(1).ToArray();
+
+                tops[tileNumber] = tile[1];
+                bottoms[tileNumber] = tile[^1];
 
                 string left = string.Empty;
                 string right = string.Empty;
@@ -37,83 +40,51 @@ namespace app
                     right += row[^1];
                 }
 
-                lefts[left] = tileNumber;
-                rights[right] = tileNumber;
+                lefts[tileNumber] = left;
+                rights[tileNumber] = right;
             }
 
-            // Find Top-Bottom joins
-            // Dictionary<long, long> topBottoms = new Dictionary<long, long>();
-            // foreach (KeyValuePair<string, long> kv in tops) {
-            //     if (bottoms.ContainsKey(kv.Key)) {
-            //         topBottoms[kv.Value] = bottoms[kv.Key];
-            //     } else if (bottoms.ContainsKey(kv.Key.Reversed())) {
-            //         topBottoms[kv.Value] = bottoms[kv.Key.Reversed()];
-            //     } else if (lefts.ContainsKey(kv.Key)) {
-            //         topBottoms[kv.Value] = lefts[kv.Key];
-            //     } else if (lefts.ContainsKey(kv.Key.Reversed())) {
-            //         topBottoms[kv.Value] = lefts[kv.Key.Reversed()];
-            //     } else if (rights.ContainsKey(kv.Key)) {
-            //         topBottoms[kv.Value] = rights[kv.Key];
-            //     } else if (rights.ContainsKey(kv.Key.Reversed())) {
-            //         topBottoms[kv.Value] = rights[kv.Key.Reversed()];
-            //     }
-            // }
+            Dictionary<long, Dictionary<string, long>> map = new Dictionary<long, Dictionary<string, long>>();
 
-            Dictionary<long, long> bottomTops = new Dictionary<long, long>();
-            foreach (KeyValuePair<string, long> kv in bottoms) {
-                if (tops.ContainsKey(kv.Key)) {
-                    bottomTops[kv.Value] = tops[kv.Key];
-                } else if (tops.ContainsKey(kv.Key.Reversed())) {
-                    bottomTops[kv.Value] = tops[kv.Key.Reversed()];
-                } else if (lefts.ContainsKey(kv.Key)) {
-                    bottomTops[kv.Value] = lefts[kv.Key];
-                } else if (lefts.ContainsKey(kv.Key.Reversed())) {
-                    bottomTops[kv.Value] = lefts[kv.Key.Reversed()];
-                } else if (rights.ContainsKey(kv.Key)) {
-                    bottomTops[kv.Value] = rights[kv.Key];
-                } else if (rights.ContainsKey(kv.Key.Reversed())) {
-                    bottomTops[kv.Value] = rights[kv.Key.Reversed()];
+            var edges = new Dictionary<string, Dictionary<long, string>>();
+            edges["Below"] = tops;
+            edges["Above"] = bottoms;
+            edges["Left"] = lefts;
+            edges["Right"] = rights;
+
+            // Each tile
+            foreach (KeyValuePair<long, string[]> tile in tiles) {
+                map[tile.Key] = new Dictionary<string, long>();
+
+                // Look at each of its edges
+                foreach (var kv in edges) {
+                    var tileEdge = kv.Value[tile.Key];
+
+                    // Compare with every other tile
+                    foreach (KeyValuePair<long, string[]> other in tiles) {
+                        if (other.Key == tile.Key) {
+                            continue;
+                        }
+
+                        // Look at each other tile's edge
+                        foreach (var kv2 in edges) {
+                            var otherEdge = kv2.Value[other.Key];
+
+                            if (tileEdge == otherEdge || tileEdge.Reversed() == otherEdge.Reversed() || tileEdge == otherEdge.Reversed()) {
+                                map[tile.Key][kv.Key] = other.Key;
+                            }
+                        }
+                    }
                 }
             }
 
-            Dictionary<long, long> leftRights = new Dictionary<long, long>();
-            foreach (KeyValuePair<string, long> kv in lefts) {
-                if (rights.ContainsKey(kv.Key)) {
-                    leftRights[kv.Value] = rights[kv.Key];
-                } else if (rights.ContainsKey(kv.Key.Reversed())) {
-                    leftRights[kv.Value] = rights[kv.Key.Reversed()];
-                } else if (tops.ContainsKey(kv.Key)) {
-                    leftRights[kv.Value] = tops[kv.Key];
-                } else if (tops.ContainsKey(kv.Key.Reversed())) {
-                    leftRights[kv.Value] = tops[kv.Key.Reversed()];
-                } else if (bottoms.ContainsKey(kv.Key)) {
-                    leftRights[kv.Value] = bottoms[kv.Key];
-                } else if (bottoms.ContainsKey(kv.Key.Reversed())) {
-                    leftRights[kv.Value] = bottoms[kv.Key.Reversed()];
-                }
-            }
-
-            // Dictionary<long, long> rightLefts = new Dictionary<long, long>();
-            // foreach (KeyValuePair<string, long> kv in rights) {
-            //     if (lefts.ContainsKey(kv.Key)) {
-            //         rightLefts[kv.Value] = lefts[kv.Key];
-            //     } else if (lefts.ContainsKey(kv.Key.Reversed())) {
-            //         rightLefts[kv.Value] = lefts[kv.Key.Reversed()];
-            //     } else if (tops.ContainsKey(kv.Key)) {
-            //         rightLefts[kv.Value] = tops[kv.Key];
-            //     } else if (tops.ContainsKey(kv.Key.Reversed())) {
-            //         rightLefts[kv.Value] = tops[kv.Key.Reversed()];
-            //     } else if (bottoms.ContainsKey(kv.Key)) {
-            //         rightLefts[kv.Value] = bottoms[kv.Key];
-            //     } else if (bottoms.ContainsKey(kv.Key.Reversed())) {
-            //         rightLefts[kv.Value] = bottoms[kv.Key.Reversed()];
-            //     }
-            // }
+            var corners = map.Where(m=>m.Value.Count == 2).Select(kv => kv.Key).ToList();
+            Console.WriteLine(corners.Aggregate((long)1, (a,v) => a*v));
         }
 
         static IEnumerable<string[]> ParseInput() {
             List<string> currentLine = new List<string>();
-            foreach (string line in File.ReadAllLines(@"example.txt")) {
+            foreach (string line in File.ReadAllLines(@"input.txt")) {
                 if (line == string.Empty) {
                     yield return currentLine.ToArray();
                     currentLine = new List<string>();
