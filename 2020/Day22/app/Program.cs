@@ -22,7 +22,7 @@ namespace app
 
             // Part1(players);
             Part2(players);
-            
+
             // Count scores
             for (int n=0; n<players.Count; n++) {
                 Console.WriteLine("Player {0} score: {1}", n+1, players[n].Select((c, i) => (players[n].Count-i) * c).Sum());
@@ -35,7 +35,6 @@ namespace app
 
             List<(List<int>, List<int>)> previousRounds = new List<(List<int>, List<int>)>();
 
-            int round = 1;
             // Play Game
             while (players.All(p => p.Count > 0)) {            
                 var decks = (players[0].ToList(), players[1].ToList());
@@ -62,7 +61,6 @@ namespace app
                 players[winningPlayer].Enqueue(currentRoundCards[winningPlayer]);
                 currentRoundCards.RemoveAt(winningPlayer);
                 currentRoundCards.ForEach(c=> players[winningPlayer].Enqueue(c));
-                round++;
             }
 
             // Count scores
