@@ -87,12 +87,7 @@ namespace app
 
             // Count scores
             for (int i=0; i<players.Count; i++) {
-                Queue<int> currentPlayer = players[i];
-                long score = 0;
-                for (int multiplier=currentPlayer.Count; multiplier>0; multiplier--) {
-                    score += currentPlayer.Dequeue() * multiplier;
-                }
-                Console.WriteLine("Player {0} score: {1}", i+1, score);
+                Console.WriteLine("Player {0} score: {1}", i+1, players[i].Select((c, i) => (players[i].Count-i) * c).Sum());
             }
         }
 
