@@ -9,6 +9,7 @@ namespace app
         static void Main(string[] args)
         {
             string input = "247819356";
+            // input = "394618527"; // Tim's input
             // input = "389125467"; // Example
             Part1(input);
             Part2(input);
@@ -16,26 +17,16 @@ namespace app
 
         static void Part1(string input) {            
             LinkedList<int> circle = new LinkedList<int>(input.Select(c => int.Parse(c.ToString())));
-            LinkedListNode<int> current = circle.First;
-
-            // Map values to list node so we can find the "destination" node.
-            Dictionary<int, LinkedListNode<int>> valueMap = new Dictionary<int, LinkedListNode<int>>();
-            while (current != null) {
-                valueMap[current.Value] = current;
-                current = current.Next;
-            }
-
-            // Part 1
-            Game(circle, valueMap, 100);
+            Game(circle, 100);
 
             // Get order from 1
-            LinkedListNode<int> node = valueMap[1].Next ?? circle.First;
-            string s = string.Empty;
-            for (int i=0; i<valueMap.Keys.Count-1; i++) {
-                s += node.Value;
+            LinkedListNode<int> node = circle.Find(1).Next ?? circle.First;
+            string result = string.Empty;
+            for (int i=0; i<8; i++) {
+                result += node.Value;
                 node=node.Next ?? circle.First;
             }
-            Console.WriteLine(s);
+            Console.WriteLine(result);
         }
 
         static void Part2(string input) {
@@ -45,28 +36,29 @@ namespace app
             }
 
             LinkedList<int> circle = new LinkedList<int>(values);
+            Game(circle, 10000000);
+
+            // Get the 2 nodes to the right of the node with value 1.
+            LinkedListNode<int> node1 = circle.Find(1).Next ?? circle.First;
+            LinkedListNode<int> node2 = node1.Next ?? circle.First;
+            Console.WriteLine((long)node1.Value * (long)node2.Value);
+        }
+
+        static void Game(LinkedList<int> circle, long nMoves) {
             LinkedListNode<int> current = circle.First;
 
-            // Map values to list node so we can find the "destination" node.
+            // Map values to list node so we can find the "destination" node quicker.
             Dictionary<int, LinkedListNode<int>> valueMap = new Dictionary<int, LinkedListNode<int>>();
             while (current != null) {
                 valueMap[current.Value] = current;
                 current = current.Next;
             }
-
-            Game(circle, valueMap, 10000000);
-            LinkedListNode<int> node1 = valueMap[1].Next ?? circle.First;
-            LinkedListNode<int> node2 = node1.Next ?? circle.First;
-
-            Console.WriteLine((long)node1.Value * (long)node2.Value);
-        }
-
-        static void Game(LinkedList<int> circle, Dictionary<int, LinkedListNode<int>> valueMap, long nMoves) {
-            LinkedListNode<int> current = circle.First;
+            
+            current = circle.First;
 
             // These are slow so keep out of the loop!
-            int minValue = valueMap.Keys.Min();
-            int maxValue = valueMap.Keys.Max();
+            int minValue = valueMap.Keys.Min(); // 1
+            int maxValue = valueMap.Keys.Max(); // circle.Count
 
             for (long move=0; move<nMoves; move++) {
                 // Get the three nodes clockwise, wrapping round to the first
@@ -78,11 +70,9 @@ namespace app
                 }
 
                 // Remove them from the circle
-                foreach (var c in clockwise) {
-                    circle.Remove(c);
-                }
+                Array.ForEach(clockwise, (n) => circle.Remove(n));
 
-                // Find the destination
+                // Find the destination index
                 int v = current.Value;
                 do {
                     v = (v > minValue) ? v - 1 : maxValue;
@@ -91,8 +81,8 @@ namespace app
                 LinkedListNode<int> destination = valueMap[v];
 
                 // Insert at the destination
-                for (int i=0; i<3; i++) {
-                    circle.AddAfter(destination, clockwise[i]);
+                foreach (LinkedListNode<int> c in clockwise) {
+                    circle.AddAfter(destination, c);
                     destination = destination.Next ?? circle.First;
                 }
 
