@@ -121,8 +121,6 @@ namespace app
                 // go through each tile
                 for (long x=minX; x<=maxX; x++) {
                     for (long y=minY; y<=maxY; y++) {
-                        // if(y%2 == 0 && x%2 != 0) continue;
-			            // if(y%2 != 0 && x%2 == 0) continue;
                         int blackTileCount = 0;
 
                         // look in the 6 directions and count black tiles
