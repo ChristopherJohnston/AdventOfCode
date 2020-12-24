@@ -109,24 +109,25 @@ namespace app
         }
 
         static (int x, int y) GetDelta(string direction) {
-            // as the grid is hexaganol, single east and west movements move +2 in the direction:
+            // As the grid is hexaganol, single east and west movements move +2 in the direction:
             //
             // =============================
-            // |   |   |   |   |   |   |   |
+            // | X |   | X |   | X |   | X |
             // -----------------------------
-            // |   |   |   |   |   |   |   |
+            // |   | X |   | X |   | X |   |
             // -----------------------------
-            // |   |   | NW|   | NE|   |   |
+            // | X |   | NW|   | NE|   | X |
             // -----------------------------
             // |   | W |   | C |   | E |   |
             // -----------------------------
-            // |   |   | SW|   | SE|   |   |
+            // | X |   | SW|   | SE|   | X |
             // -----------------------------
-            // |   |   |   |   |   |   |   |
+            // |   | X |   | X |   | X |   |
             // -----------------------------
-            // |   |   |   |   |   |   |   |
+            // | X |   | X |   | X |   | X |
             // =============================
             //
+            // This is a doubled coordinates system. See https://www.redblobgames.com/grids/hexagons/
 
             int dx = 0;
             int dy = 0;
