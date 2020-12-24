@@ -95,6 +95,85 @@ namespace app
             }
 
             Console.WriteLine(floor.Count(kv => kv.Value));
+
+            // Each day the tiles affected will increase by 1 in y (n/s) and 2 in x (e/w)
+            long minX = 0;
+            long maxX = 0;
+            long minY = 0;
+            long maxY = 0;
+
+            // first determine current dimensions
+            foreach (var key in floor.Keys) {
+                minX = Math.Min(minX, key.x);
+                minY = Math.Min(minY, key.y);
+                maxX = Math.Max(maxX, key.x);
+                maxY = Math.Max(maxY, key.y);
+            }
+
+            for (int day=0; day<100; day++) {
+                Dictionary<(long x, long y), bool> newFloor = new Dictionary<(long x, long y), bool>();
+
+                minX -= 2;
+                minY -= 1;
+                maxX += 2;
+                maxY += 1;
+
+                // go through each tile
+                for (long x=minX; x<=maxX; x++) {
+                    for (long y=minY; y<=maxY; y++) {
+                        // if(y%2 == 0 && x%2 != 0) continue;
+			            // if(y%2 != 0 && x%2 == 0) continue;
+                        int blackTileCount = 0;
+
+                        // look in the 6 directions and count black tiles
+                        foreach (string direction in new[] { "nw", "ne", "e", "se", "sw", "w"}) {
+                            int dx = 0;
+                            int dy = 0;
+                            switch (direction) {
+                                case "nw":
+                                    dx = -1;
+                                    dy = 1;
+                                    break;
+                                case "ne":
+                                    dx = 1;
+                                    dy = 1;
+                                    break;
+                                case "e":
+                                    dx = 2;
+                                    break;
+                                case "se":
+                                    dx = 1;
+                                    dy = -1;
+                                    break;
+                                case "sw":
+                                    dx = -1;
+                                    dy = -1;
+                                    break;
+                                case "w":
+                                    dx = -2;
+                                    break;
+                            }
+
+                            bool tileColour = false;
+                            floor.TryGetValue((x+dx, y+dy), out tileColour);
+                            if (tileColour)
+                                blackTileCount++;
+                        }
+
+                        bool currentTile = false;
+                        floor.TryGetValue((x, y), out currentTile);
+                        if (currentTile)
+                            newFloor[(x,y)] = (blackTileCount == 0 || blackTileCount > 2) ? false : true;
+                        else                        
+                            newFloor[(x,y)] = (blackTileCount == 2) ? true : false;
+                    }
+                }
+
+                floor = newFloor;
+                Console.WriteLine("Day {0}: {1}", day+1, floor.Count(kv => kv.Value));
+            }
+
+            Console.WriteLine(floor.Count(kv => kv.Value));
         }
 
         static IEnumerable<string> ParseInput() {
