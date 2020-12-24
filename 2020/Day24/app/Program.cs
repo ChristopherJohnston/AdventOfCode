@@ -43,25 +43,6 @@ namespace app
                 directions.Add(currentDirection);
                 
                 // Iterate through the tile's movements and determine the x,y location.
-                // as it's hexaganol, single east and west movements move +2 in the direction:
-                //
-                // =============================
-                // |   |   |   |   |   |   |   |
-                // -----------------------------
-                // |   |   |   |   |   |   |   |
-                // -----------------------------
-                // |   |   | NW|   | NE|   |   |
-                // -----------------------------
-                // |   | W |   | C |   | E |   |
-                // -----------------------------
-                // |   |   | SW|   | SE|   |   |
-                // -----------------------------
-                // |   |   |   |   |   |   |   |
-                // -----------------------------
-                // |   |   |   |   |   |   |   |
-                // =============================
-                //
-
                 int x = 0;
                 int y = 0;
                 foreach (string direction in directions) {
@@ -128,6 +109,25 @@ namespace app
         }
 
         static (int x, int y) GetDelta(string direction) {
+            // as the grid is hexaganol, single east and west movements move +2 in the direction:
+            //
+            // =============================
+            // |   |   |   |   |   |   |   |
+            // -----------------------------
+            // |   |   |   |   |   |   |   |
+            // -----------------------------
+            // |   |   | NW|   | NE|   |   |
+            // -----------------------------
+            // |   | W |   | C |   | E |   |
+            // -----------------------------
+            // |   |   | SW|   | SE|   |   |
+            // -----------------------------
+            // |   |   |   |   |   |   |   |
+            // -----------------------------
+            // |   |   |   |   |   |   |   |
+            // =============================
+            //
+
             int dx = 0;
             int dy = 0;
             switch (direction) {
