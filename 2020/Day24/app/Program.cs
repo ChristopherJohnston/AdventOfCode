@@ -11,6 +11,7 @@ namespace app
         static void Main(string[] args)
         {
             Dictionary<(long x, long y), bool> floor = new Dictionary<(long x, long y), bool>();
+
             // Determine each tile's moves
             List<List<string>> tileMoves = new List<List<string>>();
             foreach (string line in ParseInput()) {
@@ -42,6 +43,26 @@ namespace app
                 }
                 directions.Add(currentDirection);
                 
+                // Iterate through the tile's movements and determine the x,y location.
+                // as it's hexaganol, single east and west movements move +2 in the direction:
+                //
+                // =============================
+                // |   |   |   |   |   |   |   |
+                // -----------------------------
+                // |   |   |   |   |   |   |   |
+                // -----------------------------
+                // |   |   | NW|   | NE|   |   |
+                // -----------------------------
+                // |   | W |   | C |   | E |   |
+                // -----------------------------
+                // |   |   | SW|   | SE|   |   |
+                // -----------------------------
+                // |   |   |   |   |   |   |   |
+                // -----------------------------
+                // |   |   |   |   |   |   |   |
+                // =============================
+                //
+
                 int x = 0;
                 int y = 0;
                 foreach (string direction in directions) {
