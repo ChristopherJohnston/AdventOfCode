@@ -65,30 +65,9 @@ namespace app
                 int x = 0;
                 int y = 0;
                 foreach (string direction in directions) {
-                    switch (direction) {
-                        case "nw":
-                            x--;
-                            y++;
-                            break;
-                        case "ne":
-                            x++;
-                            y++;
-                            break;
-                        case "e":
-                            x+=2;
-                            break;
-                        case "se":
-                            x++;
-                            y--;
-                            break;
-                        case "sw":
-                            x--;
-                            y--;
-                            break;
-                        case "w":
-                            x-=2;
-                            break;
-                    }                    
+                    var d = GetDelta(direction);
+                    x += d.x;
+                    y += d.y;                    
                 }
                 floor[(x,y)] = (floor.ContainsKey((x,y)) && floor[(x,y)]) ? false : true;
             }
@@ -124,35 +103,10 @@ namespace app
 
                         // look in the 6 directions and count black tiles
                         foreach (string direction in new[] { "nw", "ne", "e", "se", "sw", "w"}) {
-                            int dx = 0;
-                            int dy = 0;
-                            switch (direction) {
-                                case "nw":
-                                    dx = -1;
-                                    dy = 1;
-                                    break;
-                                case "ne":
-                                    dx = 1;
-                                    dy = 1;
-                                    break;
-                                case "e":
-                                    dx = 2;
-                                    break;
-                                case "se":
-                                    dx = 1;
-                                    dy = -1;
-                                    break;
-                                case "sw":
-                                    dx = -1;
-                                    dy = -1;
-                                    break;
-                                case "w":
-                                    dx = -2;
-                                    break;
-                            }
+                            var d = GetDelta(direction);
 
                             bool tileColour = false;
-                            floor.TryGetValue((x+dx, y+dy), out tileColour);
+                            floor.TryGetValue((x + d.x, y + d.y), out tileColour);
                             if (tileColour)
                                 blackTileCount++;
                         }
@@ -171,6 +125,36 @@ namespace app
             }
 
             Console.WriteLine(floor.Count(kv => kv.Value));
+        }
+
+        static (int x, int y) GetDelta(string direction) {
+            int dx = 0;
+            int dy = 0;
+            switch (direction) {
+                case "nw":
+                    dx = -1;
+                    dy = 1;
+                    break;
+                case "ne":
+                    dx = 1;
+                    dy = 1;
+                    break;
+                case "e":
+                    dx = 2;
+                    break;
+                case "se":
+                    dx = 1;
+                    dy = -1;
+                    break;
+                case "sw":
+                    dx = -1;
+                    dy = -1;
+                    break;
+                case "w":
+                    dx = -2;
+                    break;
+            }
+            return (dx,dy);
         }
 
         static IEnumerable<string> ParseInput() {
