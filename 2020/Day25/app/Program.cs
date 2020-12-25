@@ -38,16 +38,5 @@ namespace app
 
             Console.WriteLine(Transform(publicKey, loopSize));
         }
-
-        public static long GetLoopSize(long publicKey, long subject) {
-            long loopSize = 1;
-            while (Transform(7, loopSize) != publicKey) {
-                loopSize++;
-                if (loopSize % 1000000 == 0) {
-                    Console.WriteLine("PublicKey: {0}, LoopSize: {1}", publicKey, loopSize);
-                }
-            }
-            return loopSize;
-        }
     }
 }
