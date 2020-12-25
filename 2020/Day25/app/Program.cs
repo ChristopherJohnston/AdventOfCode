@@ -21,13 +21,25 @@ namespace app
             // cardPublicKey = 5764801;
             // doorPublicKey = 17807724;
 
-            long cardLoopSize = GetLoopSize(cardPublicKey, 7);
-            long doorLoopSize = GetLoopSize(doorPublicKey, 7);
+            long loopSize = 1;
+            long encryptionKey = 0;
 
-            long cardEncryptionKey = Transform(doorPublicKey, cardLoopSize);
-            long doorEncryptionKey = Transform(cardPublicKey, doorLoopSize);
-
-            Console.WriteLine("Card: {0}, Door: {0}", cardEncryptionKey, doorEncryptionKey);
+            while (true) {
+                long pk = Transform(7, loopSize);
+                if (pk == cardPublicKey) {
+                    encryptionKey = Transform(doorPublicKey, loopSize);
+                    Console.WriteLine(encryptionKey);
+                    break;
+                } else if (pk == doorPublicKey) {
+                    encryptionKey = Transform(cardPublicKey, loopSize);
+                    Console.WriteLine(encryptionKey);
+                    break;
+                }
+                loopSize++;
+                if (loopSize % 1000000 == 0) {
+                    Console.WriteLine("LoopSize: {0}", loopSize);
+                }
+            }
         }
 
         public static long GetLoopSize(long publicKey, long subject) {
