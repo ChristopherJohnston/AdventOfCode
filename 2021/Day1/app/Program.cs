@@ -33,29 +33,21 @@ namespace app
         }
 
         static void Part2() {
-            long[] prevMeasurements = new long[3];
-            long[] currMeasurements = new long[3];
-            int i=0;
-
+            Queue<long> measurements = new Queue<long>();
             int numIncreases = 0;
 
-            foreach (string d in ParseInput()) {
-                long depth = long.Parse(d);
+            foreach (string d in ParseInput().Take(3)) {
+                measurements.Enqueue(long.Parse(d));
+            }
 
-                if (i < 3) {
-                    prevMeasurements[i] = depth;
-                    i++;
-                }
-                else {
-                    currMeasurements[0] = prevMeasurements[1];
-                    currMeasurements[1] = prevMeasurements[2];
-                    currMeasurements[2] = depth;
+            foreach (string d in ParseInput().Skip(3)) {
+                long prevSum = measurements.Sum();
+                
+                measurements.Dequeue();
+                measurements.Enqueue(long.Parse(d));
 
-                    if (prevMeasurements.Sum() < currMeasurements.Sum()) {
-                        numIncreases++;
-                    }
-                    
-                    currMeasurements.CopyTo(prevMeasurements, 0);
+                if (prevSum < measurements.Sum()) {
+                    numIncreases++;
                 }
             }
 
