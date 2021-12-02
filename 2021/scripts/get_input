@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+import argparse
+import sys
+import os
+import prettytable
+import requests
+import urllib3
+import json
+import datetime
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog='setup',
+        description="Daily setup script"
+    )
+    parser.add_argument('--day', type=str, help="The day to set up.")
+    parser.add_argument('--year', type=str, help="The year to set up")
+    parser.set_defaults(year=datetime.date.today().year)
+    parser.set_defaults(day=datetime.date.today().day)
+    args = parser.parse_args()
+
+    with requests.Session() as s:
+        s.cookies.set("session", os.environ['AOC_SESSION'])
+        result = s.get(f"https://adventofcode.com/{args.year}/day/{args.day}/input")
+        day_input = result.content.decode("utf-8")
+
+        print(day_input)
+        with open("input.txt", "w") as f:
+            f.writelines(day_input)
+
+if __name__ == '__main__':
+    main()
