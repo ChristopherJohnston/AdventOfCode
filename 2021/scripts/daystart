@@ -2,17 +2,20 @@
 import argparse
 import sys
 import os
+import requests
+import datetime
 
 def main():
     parser = argparse.ArgumentParser(
         prog='setup',
         description="Daily setup script"
     )
+    today = datetime.date.today()
     parser.add_argument('day', type=str, help="The day to set up.")
     parser.add_argument('--year', type=str, help="The year to set up")
-    parser.set_defaults(year='2021')
     parser.add_argument('--part', type=str, help="The part of the day.")
-    parser.set_defaults(part='1')
+    parser.add_argument('--no-input', dest='noinput', action='store_true', help="Prevents the puzzle input from being downloaded")
+    parser.set_defaults(year=today.year, part=1, noinput=False)
     args = parser.parse_args()
 
     os.system(f"git checkout -b {args.year}_Day{args.day}_Part{args.part}")
@@ -23,6 +26,12 @@ def main():
     os.system("dotnet sln add app/app.csproj")
     os.system('touch input.txt')
     os.system("code .")
+
+    if args.noinput == False:
+        with requests.Session() as s:
+            s.cookies.set("session", os.environ['AOC_SESSION'])
+            with open("input.txt", "w") as f:
+                f.writelines(s.get(f"https://adventofcode.com/{args.year}/day/{args.day}/input").content.decode("utf-8"))
 
 
 if __name__ == '__main__':
