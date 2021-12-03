@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Common;
 
 namespace app
 {
@@ -92,7 +93,7 @@ namespace app
             int rowCount = 0;
 
             // Go through the input and sum the columns
-            foreach (string d in ParseInput()) {
+            foreach (string d in FileUtils.ParseInput(file)) {
                 for (int i=0; i<d.Length; i++) {
                     int val = int.Parse(d[i].ToString());
 
@@ -117,15 +118,15 @@ namespace app
                 epsilon += (numOnes >= 0.5) ? '0' : '1';
             }
 
-            int gammaInt = Convert.ToInt32(gamma, 2);
-            int epsilonInt = Convert.ToInt32(epsilon, 2);
+            int gammaInt = gamma.BinaryToInt32();
+            int epsilonInt = epsilon.BinaryToInt32();
 
             // Gamma: 2663, Epsilon: 1432, Multiple: 3813416
             Console.WriteLine($"Gamma: {gammaInt}, Epsilon: {epsilonInt}, Multiple: {gammaInt*epsilonInt}");
         }
 
         static void Part2() {
-            List<string> input = ParseInput().ToList();
+            List<string> input = FileUtils.ParseInput(file).ToList();
             string oxygenRating = string.Empty;
             string scrubberRating = string.Empty;
         
@@ -171,12 +172,6 @@ namespace app
 
             // if the sum of the column is greater than half then there's more ones than zeros.
             return ((float)colTotal/rowCount >= 0.5) ? (ones, zeros) : (zeros, ones);
-        }
-        
-        static IEnumerable<string> ParseInput() {
-            foreach (string line in File.ReadAllLines(file)) {
-                yield return line;
-            }
         }
     }
 }
