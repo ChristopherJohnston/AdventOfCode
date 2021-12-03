@@ -102,7 +102,7 @@ namespace app
 
                     c[i] += val;
                 }
-                rowCount += 1;
+                rowCount++;
             }
 
             // Convert the columns into binary string
@@ -120,6 +120,7 @@ namespace app
             int gammaInt = Convert.ToInt32(gamma, 2);
             int epsilonInt = Convert.ToInt32(epsilon, 2);
 
+            // Gamma: 2663, Epsilon: 1432, Multiple: 3813416
             Console.WriteLine($"Gamma: {gammaInt}, Epsilon: {epsilonInt}, Multiple: {gammaInt*epsilonInt}");
         }
 
@@ -136,28 +137,24 @@ namespace app
                 oxygens = FilterNumbers(oxygens, numPasses).mostCommon;
                 scrubbers = FilterNumbers(scrubbers, numPasses).leastCommon;
 
-                Console.WriteLine($"Pass #{numPasses}");
-                Console.WriteLine($"{oxygens.Count} oxygens");
-                Console.WriteLine($"{scrubbers.Count} scrubbers");
+                Console.WriteLine($"Pass #{numPasses++}: {oxygens.Count} oxygens, {scrubbers.Count} scrubbers");
 
                 oxygenRating = (oxygenRating == string.Empty && oxygens.Count == 1) ? oxygens[0] : oxygenRating;
                 scrubberRating = (scrubberRating == string.Empty && scrubbers.Count == 1) ? scrubbers[0] : scrubberRating;
-
-                numPasses++;
             }
 
             int oxygenRatingInt = Convert.ToInt32(oxygenRating, 2);
             int scrubberRatingInt = Convert.ToInt32(scrubberRating, 2);
 
+            // Oxygen: 2526, Scrubber: 1184, Answer: 2990784
             Console.WriteLine($"Oxygen: {oxygenRatingInt}, Scrubber: {scrubberRatingInt}, Answer: {oxygenRatingInt*scrubberRatingInt}");
         }
 
         static (List<string> mostCommon, List<string> leastCommon) FilterNumbers(IEnumerable<string> input, int bit) {
             int colTotal = 0;
+            int rowCount = 0;
             List<string> ones = new List<string>();
             List<string> zeros = new List<string>();
-
-            int rowCount = 0;
 
             foreach (string d in input) {
                 int val = int.Parse(d[bit].ToString());
@@ -169,18 +166,11 @@ namespace app
                     ones.Add(d);
                 }
 
-                rowCount += 1;
+                rowCount++;
             }
 
             // if the sum of the column is greater than half then there's more ones than zeros.
-            float mostCommon = (float)colTotal/rowCount;
-            if (mostCommon >= 0.5) {
-                // One is most common or equally common
-                return (ones, zeros);
-            } else {
-                // Zero is most common
-                return (zeros, ones);
-            }
+            return ((float)colTotal/rowCount >= 0.5) ? (ones, zeros) : (zeros, ones);
         }
         
         static IEnumerable<string> ParseInput() {
