@@ -24,6 +24,7 @@ def main():
     os.chdir(f"./Day{args.day}")
     os.system("dotnet new console -o app")
     os.system("dotnet sln add app/app.csproj")
+    os.system("dotnet add app/app.csproj reference ../../Common/Common/Common.csproj")
     os.system('touch input.txt')
     os.system("code .")
 
