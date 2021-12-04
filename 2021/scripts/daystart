@@ -69,7 +69,13 @@ def main():
                 "path": "../scripts"
             }
 	    ],
-	    "settings": {}
+	    "settings": {
+            "files.exclude": {
+                "**/bin/": True,
+                "**/obj": True,
+                "**/.gitignore": True
+            }
+        }
     }
 
     with open(workspaceFile, "w") as f:
