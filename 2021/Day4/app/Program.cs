@@ -62,6 +62,17 @@ namespace app
     The score of the winning board can now be calculated. Start by finding the sum of all unmarked numbers on that board; in this case, the sum is 188. Then, multiply that sum by the number that was just called when the board won, 24, to get the final score, 188 * 24 = 4512.
 
     To guarantee victory against the giant squid, figure out which board will win first. What will your final score be if you choose that board?
+
+
+    --- Part Two ---
+
+    On the other hand, it might be wise to try a different strategy: let the giant squid win.
+
+    You aren't sure how many bingo boards a giant squid could play at once, so rather than waste time counting its arms, the safe thing to do is to figure out which board will win last and choose that one. That way, no matter which boards it picks, it will win for sure.
+
+    In the above example, the second board is the last to win, which happens after 13 is eventually called and its middle column is completely marked. If you were to keep playing until this point, the second board would have a sum of unmarked numbers equal to 148 for a final score of 148 * 13 = 1924.
+
+    Figure out which board will win last. Once it wins, what would its final score be?
     */
     class Program
     {
@@ -72,37 +83,56 @@ namespace app
             if (args.Length > 0) {
                 file = args[0];
             }
-
+            Console.WriteLine("**** Part 1 ****");
             Part1();
+            Console.WriteLine("**** Part 2 ****");
+            Part2();
         }
 
         static void Part1() {
             List<string> input = FileUtils.ParseInput(file).ToList();
             
             var numbers = input[0].SplitToList<int>();
-            List<int[][]> cards = GetCards(input.Skip(2).ToList());
-            
-            List<bool[][]> matches = new List<bool[][]>();
-
-            foreach (int[][] card in cards) {
-                bool[][] cardMatches = new bool[card.Length][];
-                for (int r=0;r<cardMatches.Length;r++) {
-                    cardMatches[r] = new bool[card[r].Length];
-                }
-                matches.Add(cardMatches);
-            }
+            List<int[][]> cards = GetCards(input.Skip(2).ToList());            
+            List<bool[][]> matches = GetEmptyMatches(cards);
 
             foreach (int number in numbers) {
                 matches = CheckNumbers(cards, matches, number);
 
-                int? winningCardIndex = CheckForWinner(cards, matches);
+                List<int> winners = CheckForWinners(cards, matches);
 
-                if (winningCardIndex.HasValue) {
-                    int score = GetCardScore(cards[winningCardIndex.Value], matches[winningCardIndex.Value]);
+                foreach (int winningCardIndex in winners) {    
+                    int score = GetCardScore(cards[winningCardIndex], matches[winningCardIndex]);
                     Console.WriteLine($"Winner! Card {winningCardIndex} scores {score}. Answer: {score*number}");
-                    break;
+                    return;
                 }
-            }          
+            }
+        }
+
+        static void Part2() {
+            List<string> input = FileUtils.ParseInput(file).ToList();
+            
+            var numbers = input[0].SplitToList<int>();
+            List<int[][]> cards = GetCards(input.Skip(2).ToList());            
+            List<bool[][]> matches = GetEmptyMatches(cards);
+
+            int lastWinnerScore = 0;
+
+            foreach (int number in numbers) {
+                matches = CheckNumbers(cards, matches, number);
+                List<int> winners = CheckForWinners(cards, matches);
+
+                foreach (int winningCardIndex in winners) {         
+                    int cardScore = GetCardScore(cards[winningCardIndex], matches[winningCardIndex]);
+                    lastWinnerScore = cardScore * number;
+                    Console.WriteLine($"Winner! Card {winningCardIndex} scores {cardScore} with number {number}. Answer: {lastWinnerScore}");
+
+                    cards.RemoveAt(winningCardIndex);
+                    matches.RemoveAt(winningCardIndex);
+                }
+            }
+            
+            Console.WriteLine($"Loser! Final Score: {lastWinnerScore}");
         }
 
         static int GetCardScore(int[][] card, bool[][] matches) {
@@ -117,13 +147,15 @@ namespace app
             return score;
         }
 
-        static int? CheckForWinner(List<int[][]> cards, List<bool[][]> matches) {
+        static List<int> CheckForWinners(List<int[][]> cards, List<bool[][]> matches) {
+            List<int> winners = new List<int>();
+
             for (int i=0; i<matches.Count;i++) {
                 bool[][] card = matches[i];
                 // Check rows
                 for (int r=0; r<card.Length; r++) {
                     if (card[r].All(x => x==true)) {
-                        return i;
+                        winners.Add(i);
                     }
                 }
 
@@ -135,12 +167,15 @@ namespace app
                         col.Add(card[r][c]);
                     }
                     if (col.All(x => x==true)) {
-                        return i;
+                        winners.Add(i);
                     }
                 }
             }
 
-            return null;
+            // Sort and reverse indices so they are removed from the list correctly
+            winners.Sort();
+            winners.Reverse();
+            return winners;
         }
 
         static List<bool[][]> CheckNumbers(List<int[][]> cards, List<bool[][]> matches, int number) {
@@ -157,6 +192,19 @@ namespace app
             return matches;
         }
 
+        static List<bool[][]> GetEmptyMatches(List<int[][]> cards) {
+            List<bool[][]> matches = new List<bool[][]>();
+
+            foreach (int[][] card in cards) {
+                bool[][] cardMatches = new bool[card.Length][];
+                for (int r=0;r<cardMatches.Length;r++) {
+                    cardMatches[r] = new bool[card[r].Length];
+                }
+                matches.Add(cardMatches);
+            }
+
+            return matches;
+        }
         static List<int[][]> GetCards(List<string> input) {
             List<int[][]> cards = new List<int[][]>();
             int start = 0;
