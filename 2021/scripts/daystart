@@ -4,6 +4,7 @@ import sys
 import os
 import requests
 import datetime
+import json
 
 def main():
     parser = argparse.ArgumentParser(
@@ -15,9 +16,16 @@ def main():
     parser.add_argument('--year', type=str, help="The year to set up")
     parser.add_argument('--part', type=str, help="The part of the day.")
     parser.add_argument('--no-input', dest='noinput', action='store_true', help="Prevents the puzzle input from being downloaded")
-    parser.set_defaults(year=today.year, part=1, noinput=False)
+    parser.add_argument('--reset', dest='reset', action='store_true', help="Resets the day")
+    parser.set_defaults(year=today.year, part=1, noinput=False, reset=False)
     args = parser.parse_args()
 
+    if args.reset:
+        os.system(f"rm -r Day{args.day}")
+        os.system(f"git checkout master")
+        os.system(f"git branch -d {args.year}_Day{args.day}_Part{args.part}")
+        return
+        
     os.system(f"git checkout -b {args.year}_Day{args.day}_Part{args.part}")
     os.system(f"dotnet new sln -o Day{args.day}")
     os.system(f"cp ./scripts/.gitignore ./Day{args.day}/.gitignore")
@@ -26,7 +34,6 @@ def main():
     os.system("dotnet sln add app/app.csproj")
     os.system("dotnet add app/app.csproj reference ../../Common/Common/Common.csproj")
     os.system('touch input.txt')
-    os.system("code .")
 
     if args.noinput == False:
         with requests.Session() as s:
@@ -34,6 +41,74 @@ def main():
             with open("input.txt", "w") as f:
                 f.writelines(s.get(f"https://adventofcode.com/{args.year}/day/{args.day}/input").content.decode("utf-8"))
 
+    workspaceFile = f"Day{args.day}-workspace.code-workspace"
+    workspaceSettings = {
+	    "folders": [
+            {
+                "path": "."
+            },
+            {
+                "path": "../../Common"
+            },
+            {
+                "path": "../scripts"
+            }
+	    ],
+	    "settings": {}
+    }
 
+    with open(workspaceFile, "w") as f:
+        f.write(json.dumps(workspaceSettings))
+
+    os.mkdir(".vscode")
+
+    launchFile = {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": ".NET Core Launch (console)",
+                "type": "coreclr",
+                "request": "launch",
+                "preLaunchTask": "build",
+                "program": "${workspaceFolder}/app/bin/Debug/net6.0/app.dll",
+                "args": [],
+                "cwd": "${workspaceFolder}/app",
+                "console": "internalConsole",
+                "stopAtEntry": False
+            },
+            {
+                "name": ".NET Core Attach",
+                "type": "coreclr",
+                "request": "attach"
+            }
+        ]
+    }
+
+    with open(f".vscode/launch.json", "w") as f:
+        f.write(json.dumps(launchFile))
+
+    tasksFile = {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "build",
+                "command": "dotnet",
+                "type": "process",
+                "args": [
+                    "build",
+                    "${workspaceFolder}/app/app.csproj",
+                    "/property:GenerateFullPaths=true",
+                    "/consoleloggerparameters:NoSummary"
+                ],
+                "problemMatcher": "$msCompile"
+            }            
+        ]
+    }
+
+    with open(f".vscode/tasks.json", "w") as f:
+        f.write(json.dumps(tasksFile))
+
+    os.system(f"code {workspaceFile}")
+    
 if __name__ == '__main__':
     main()
