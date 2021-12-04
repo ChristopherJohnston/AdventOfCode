@@ -103,6 +103,7 @@ namespace app
 
                 foreach (int winningCardIndex in winners) {    
                     int score = GetCardScore(cards[winningCardIndex], matches[winningCardIndex]);
+                    // Winner! Card 7 scores 330. Answer: 8580
                     Console.WriteLine($"Winner! Card {winningCardIndex} scores {score}. Answer: {score*number}");
                     return;
                 }
@@ -116,23 +117,22 @@ namespace app
             List<int[][]> cards = GetCards(input.Skip(2).ToList());            
             List<bool[][]> matches = GetEmptyMatches(cards);
 
-            int lastWinnerScore = 0;
-
             foreach (int number in numbers) {
                 matches = CheckNumbers(cards, matches, number);
                 List<int> winners = CheckForWinners(cards, matches);
 
-                foreach (int winningCardIndex in winners) {         
-                    int cardScore = GetCardScore(cards[winningCardIndex], matches[winningCardIndex]);
-                    lastWinnerScore = cardScore * number;
-                    Console.WriteLine($"Winner! Card {winningCardIndex} scores {cardScore} with number {number}. Answer: {lastWinnerScore}");
+                foreach (int winningCardIndex in winners) {
+                    if (cards.Count == 1) {
+                        int cardScore = GetCardScore(cards[winningCardIndex], matches[winningCardIndex]);
+                        // Loser! Final card scores 228 with number 42. Answer: 9576
+                        Console.WriteLine($"Loser! Final card scores {cardScore} with number {number}. Answer: {cardScore * number}");
+                        return;
+                    }
 
                     cards.RemoveAt(winningCardIndex);
                     matches.RemoveAt(winningCardIndex);
                 }
             }
-            
-            Console.WriteLine($"Loser! Final Score: {lastWinnerScore}");
         }
 
         static int GetCardScore(int[][] card, bool[][] matches) {
