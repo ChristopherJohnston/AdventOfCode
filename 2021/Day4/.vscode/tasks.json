@@ -1,0 +1,52 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/app/app.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "leaderboard",
+            "command": "../scripts/leaderboard",
+            "type": "process"
+        },
+        {
+            "label": "input",
+            "command": "../scripts/get_input",
+            "type": "process"
+        },
+        {
+            "label": "run_example",
+            "command": "dotnet",
+            "args": [
+                "run",
+                "-p",
+                "${workspaceFolder}/app/app.csproj",
+                "example.txt"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "run",
+            "command": "dotnet",
+            "args": [
+                "run",
+                "-p",
+                "${workspaceFolder}/app/app.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
