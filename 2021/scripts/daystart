@@ -25,22 +25,37 @@ def main():
         os.system(f"git checkout master")
         os.system(f"git branch -d {args.year}_Day{args.day}_Part{args.part}")
         return
-        
+    
+    # Checkout new branch and create the solution
     os.system(f"git checkout -b {args.year}_Day{args.day}_Part{args.part}")
     os.system(f"dotnet new sln -o Day{args.day}")
     os.system(f"cp ./scripts/.gitignore ./Day{args.day}/.gitignore")
+
+    # Append the day to the Year's workspace
+    with open("workspace.code-workspace", "r") as f:
+        s = json.loads(''.join(f.readlines()))
+        if "folders" not in s:
+            s["folders"] = []
+
+        s["folders"].append({"path": f"Day{args.day}"})
+
+    with open("workspace.code-workspace", "w") as f:
+        f.write(json.dumps(s))
+
     os.chdir(f"./Day{args.day}")
     os.system("dotnet new console -o app")
     os.system("dotnet sln add app/app.csproj")
     os.system("dotnet add app/app.csproj reference ../../Common/Common/Common.csproj")
     os.system('touch input.txt')
 
+    # Retrieve the day's input and save to input.txt
     if args.noinput == False:
         with requests.Session() as s:
             s.cookies.set("session", os.environ['AOC_SESSION'])
             with open("input.txt", "w") as f:
                 f.writelines(s.get(f"https://adventofcode.com/{args.year}/day/{args.day}/input").content.decode("utf-8"))
 
+    # Add code workspace for the day
     workspaceFile = f"Day{args.day}-workspace.code-workspace"
     workspaceSettings = {
 	    "folders": [
@@ -60,6 +75,7 @@ def main():
     with open(workspaceFile, "w") as f:
         f.write(json.dumps(workspaceSettings))
 
+    # Create launch configuration for the project so we can debug
     os.mkdir(".vscode")
 
     launchFile = {
@@ -75,11 +91,6 @@ def main():
                 "cwd": "${workspaceFolder}/app",
                 "console": "internalConsole",
                 "stopAtEntry": False
-            },
-            {
-                "name": ".NET Core Attach",
-                "type": "coreclr",
-                "request": "attach"
             }
         ]
     }
@@ -108,7 +119,9 @@ def main():
     with open(f".vscode/tasks.json", "w") as f:
         f.write(json.dumps(tasksFile))
 
-    os.system(f"code {workspaceFile}")
+
+    # Finally, open the workspace in VSCode
+    os.system(f"code ../workspace.code-workspace")
     
 if __name__ == '__main__':
     main()
