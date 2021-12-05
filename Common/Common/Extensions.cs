@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Common {
     public static class StringExtensions {
@@ -18,11 +19,7 @@ namespace Common {
         }
 
         public static IEnumerable<T> SplitToList<T>(this string str, char separator=',') {
-            List<T> output = new List<T>();
-            foreach (string val in str.Split(separator)) {
-                output.Add((T)Convert.ChangeType(val, typeof(T)));
-            }
-            return output;
+            return str.Split(separator).Select(n=> (T)Convert.ChangeType(n, typeof(T)));
         }
     }
 }
