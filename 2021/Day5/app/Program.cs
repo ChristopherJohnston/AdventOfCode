@@ -46,6 +46,30 @@ namespace app
     To avoid the most dangerous areas, you need to determine the number of points where at least two lines overlap. In the above example, this is anywhere in the diagram with a 2 or larger - a total of 5 points.
 
     Consider only horizontal and vertical lines. At how many points do at least two lines overlap?
+
+    --- Part Two ---
+
+    Unfortunately, considering only horizontal and vertical lines doesn't give you the full picture; you need to also consider diagonal lines.
+
+    Because of the limits of the hydrothermal vent mapping system, the lines in your list will only ever be horizontal, vertical, or a diagonal line at exactly 45 degrees. In other words:
+
+    An entry like 1,1 -> 3,3 covers points 1,1, 2,2, and 3,3.
+    An entry like 9,7 -> 7,9 covers points 9,7, 8,8, and 7,9.
+    Considering all lines from the above example would now produce the following diagram:
+
+    1.1....11.
+    .111...2..
+    ..2.1.111.
+    ...1.2.2..
+    .112313211
+    ...1.2....
+    ..1...1...
+    .1.....1..
+    1.......1.
+    222111....
+    You still need to determine the number of points where at least two lines overlap. In the above example, this is still anywhere in the diagram with a 2 or larger - now a total of 12 points.
+
+    Consider all of the lines. At how many points do at least two lines overlap?
     */
     class Program
     {
@@ -59,10 +83,17 @@ namespace app
 
             List<string> input = FileUtils.ParseInput(file).ToList();
 
-            Part1(input);
+            int part1Answer = GetOverlaps(input, false);
+            // Part1 Answer: 7318
+            Console.WriteLine($"Part1 Answer: {part1Answer}");
+
+            int part2Answer = GetOverlaps(input, true);
+            // Part2 Answer: 7318
+            Console.WriteLine($"Part2 Answer: {part2Answer}");
         }
 
-        static void Part1(List<string> input) {
+
+        static int GetOverlaps(List<string> input, bool includeDiagonals) {
             Dictionary<(int x, int y), int> d = new Dictionary<(int x, int y), int>();
 
             foreach (string segment in input) {
@@ -81,20 +112,51 @@ namespace app
                     for (int y=minY; y<=maxY; y++) {
                         d[(x1, y)] = (d.ContainsKey((x1, y))) ? d[(x1, y)] + 1 : 1;
                     }
-
                 } else if (y1==y2) {
                     //vertical
-
                     int minX = Math.Min(x1,x2);
                     int maxX = Math.Max(x1, x2);
 
                     for (int x=minX; x<=maxX; x++) {
                         d[(x, y1)] = (d.ContainsKey((x, y1))) ? d[(x, y1)] + 1 : 1;
                     }
+                } else if (includeDiagonals) {
+                    // diagonal
+                    if (x2 > x1 && y1 > y2) {
+                        // x up, y down
+                        int y = y1;
+                        for (int x=x1; x<=x2; x++) {
+                            d[(x, y)] = (d.ContainsKey((x, y))) ? d[(x, y)] + 1 : 1;
+                            y--;
+                        }                
+                    } else if (x1 > x2 && y2 > y1) {
+                        // x down, y up
+                        int y = y1;
+                        for (int x=x1; x>=x2; x--) {
+                            d[(x, y)] = (d.ContainsKey((x, y))) ? d[(x, y)] + 1 : 1;
+                            y++;
+                        }
+                    } else if (x2 > x1 && y2 > y1) {
+                        // x up, y up
+                        int y = y1;
+                        for (int x=x1; x<=x2; x++) {
+                            d[(x, y)] = (d.ContainsKey((x, y))) ? d[(x, y)] + 1 : 1;
+                            y++;
+                        }
+                    } else if (x1 > x2 && y1 > y2) {
+                        // x down, y down
+                        int y = y1;
+                        for (int x=x1; x>=x2; x--) {
+                            d[(x, y)] = (d.ContainsKey((x, y))) ? d[(x, y)] + 1 : 1;
+                            y--;
+                        }
+                    }
                 } else {
-                    Console.WriteLine("Line is not horizontal or vertical");
+                    Console.WriteLine("Line has not been recognised");
                 }
             }
+
+            Render(d);
 
             int multipleOverlaps = 0;
             foreach (var kv in d) {
@@ -103,7 +165,29 @@ namespace app
                 }
             }
 
-            Console.WriteLine($"Part1 Answer: {multipleOverlaps}");
+            return multipleOverlaps;
+        }
+
+        public static void Render(Dictionary<(int x, int y), int> d) {
+            int minX = 0;
+            int maxX = 0;
+            int minY = 0;
+            int maxY = 0;
+
+            foreach (var k in d.Keys) {
+                minX = Math.Min(minX, k.x);
+                maxX = Math.Max(maxX, k.x);
+                minY = Math.Min(minY, k.y);
+                maxY = Math.Max(maxY, k.y);
+            }
+
+            for (int c=minY; c<=maxY; c++) {
+                string row = string.Empty;
+                for (int r=minX; r<=maxX; r++){
+                    row += (d.ContainsKey((r,c))) ? d[(r,c)].ToString() : ".";
+                }
+                Console.WriteLine(row);
+            }
         }
     }
 }
