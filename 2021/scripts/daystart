@@ -136,6 +136,11 @@ def main():
                 "problemMatcher": "$msCompile"
             },
             {
+                "label": "leaderboard",
+                "command": "../scripts/leaderboard",
+                "type": "process"
+            },
+            {
                 "label": "input", 
                 "command": "../scripts/get_input", "type": "process"
             },
