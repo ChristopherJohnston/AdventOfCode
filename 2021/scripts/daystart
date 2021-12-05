@@ -47,6 +47,7 @@ def main():
     os.system("dotnet sln add app/app.csproj")
     os.system("dotnet add app/app.csproj reference ../../Common/Common/Common.csproj")
     os.system('touch input.txt')
+    os.system('touch example.txt')
 
     # Retrieve the day's input and save to input.txt
     if args.noinput == False:
