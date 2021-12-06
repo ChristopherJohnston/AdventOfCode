@@ -57,6 +57,14 @@ namespace app
     In this example, after 18 days, there are a total of 26 fish. After 80 days, there would be a total of 5934.
 
     Find a way to simulate lanternfish. How many lanternfish would there be after 80 days?
+
+    --- Part Two ---
+
+    Suppose the lanternfish live forever and have unlimited food and space. Would they take over the entire ocean?
+
+    After 256 days in the example above, there would be a total of 26984457539 lanternfish!
+
+    How many lanternfish would there be after 256 days?
     */
     class Program
     {static string file = @"input.txt";
@@ -69,39 +77,44 @@ namespace app
 
             List<string> input = FileUtils.ParseInput(file).ToList();
             List<int> initialState = input[0].SplitToList<int>().ToList();
-            PrintState(0, initialState);            
-            Part1(initialState);
+
+            // Part 1 Answer: 386640
+            Console.WriteLine($"Part 1 Answer: {RunSimulation(80, initialState)}");
+            // Part 2 Answer: 1733403626279
+            Console.WriteLine($"Part 2 Answer: {RunSimulation(256, initialState)}");
         }
 
         static void PrintState(int days, List<int> state) {
             Console.WriteLine($"After {days} days. {string.Join(',', state)}");
         }
 
-        static void Part1(List<int> state) {
+        static long RunSimulation(int daysToRun, List<int> state) {
             int day = 0;
 
-            while (day<80) {
-                int toAdd = 0;
-                day++;
-
-                for (int i=0; i<state.Count; i++) {
-                    if (state[i] == 0) {
-                        toAdd++;
-                        state[i] = 6;
-                    }
-                    else {
-                        state[i]--;
-                    }
-                }
-
-                for (int i=0; i<toAdd; i++) {
-                    state.Add(8);
-                }
-
-                //PrintState(day, state);
+            // Using a list of all lanternfish is inefficient and will result in out of memory exception.
+            // Store as their count for each state (day 0 to day 8)
+            long[] s = new long[9];
+            foreach (int val in state) {
+                s[val]++;
             }
 
-            Console.WriteLine($"Part 1 Answer: {state.Count}");
+            while (day<daysToRun) {
+                //PrintState(day, s.ToList());
+    
+                day++;
+                long timerAtZero = s[0];
+
+                /// Each day the timer of shifts left by one
+                for (int i=0; i<8; i++) {                    
+                    s[i] = s[i+1];
+                }
+
+                // Each lanternfish with timer at zero resets to 6 and generates a new lanternfish with state of 8.
+                s[6] += timerAtZero;
+                s[8] = timerAtZero;
+            }
+
+            return s.Sum();
         }
     }
 }
