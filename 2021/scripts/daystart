@@ -162,8 +162,9 @@ def main():
         f.write(json.dumps(tasksFile))
 
 
-    # Finally, open the workspace in VSCode
+    # Finally, open the workspace in VSCode and the puzzle in safari
     os.system(f"code ../workspace.code-workspace")
+    os.system(f"open https://adventofcode.com/{args.year}/day/{args.day}")
     
 if __name__ == '__main__':
     main()
