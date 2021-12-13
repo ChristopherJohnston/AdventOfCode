@@ -59,10 +59,56 @@ namespace app
 
     Find the first illegal character in each corrupted line of the navigation subsystem. What is the total syntax error score for those errors?
 
+    --- Part Two ---
+
+    Now, discard the corrupted lines. The remaining lines are incomplete.
+
+    Incomplete lines don't have any incorrect characters - instead, they're missing some closing characters at the end of the line. To repair the navigation subsystem, you just need to figure out the sequence of closing characters that complete all open chunks in the line.
+
+    You can only use closing characters (), ], }, or >), and you must add them in the correct order so that only legal pairs are formed and all chunks end up closed.
+
+    In the example above, there are five incomplete lines:
+
+    [({(<(())[]>[[{[]{<()<>> - Complete by adding }}]])})].
+    [(()[<>])]({[<{<<[]>>( - Complete by adding )}>]}).
+    (((({<>}<{<{<>}{[]{[]{} - Complete by adding }}>}>)))).
+    {<[[]]>}<{[{[{[]{()[[[] - Complete by adding ]]}}]}]}>.
+    <{([{{}}[<[[[<>{}]]]>[]] - Complete by adding ])}>.
+    Did you know that autocomplete tools also have contests? It's true! The score is determined by considering the completion string character-by-character. Start with a total score of 0. Then, for each character, multiply the total score by 5 and then increase the total score by the point value given for the character in the following table:
+
+    ): 1 point.
+    ]: 2 points.
+    }: 3 points.
+    >: 4 points.
+    So, the last completion string above - ])}> - would be scored as follows:
+
+    Start with a total score of 0.
+    Multiply the total score by 5 to get 0, then add the value of ] (2) to get a new total score of 2.
+    Multiply the total score by 5 to get 10, then add the value of ) (1) to get a new total score of 11.
+    Multiply the total score by 5 to get 55, then add the value of } (3) to get a new total score of 58.
+    Multiply the total score by 5 to get 290, then add the value of > (4) to get a new total score of 294.
+    The five lines' completion strings have total scores as follows:
+
+    }}]])})] - 288957 total points.
+    )}>]}) - 5566 total points.
+    }}>}>)))) - 1480781 total points.
+    ]]}}]}]}> - 995444 total points.
+    ])}> - 294 total points.
+    Autocomplete tools are an odd bunch: the winner is found by sorting all of the scores and then taking the middle score. (There will always be an odd number of scores to consider.) In this example, the middle score is 288957 because there are the same number of scores smaller and larger than it.
+
+    Find the completion string for each incomplete line, score the completion strings, and sort the scores. What is the middle score?
+
     */
     class Program
     {
         static string file = @"input.txt";
+
+        static Dictionary<char, char> pairs = new Dictionary<char, char>() {
+                {'{', '}'},
+                {'[', ']'},
+                {'(', ')'},
+                {'<', '>'}
+        };
 
         static void Main(string[] args)
         {
@@ -72,18 +118,16 @@ namespace app
             
             List<string> input = FileUtils.ParseInput(file).ToList();
 
-            Part1(input);
-        }
-        
-        static void Part1(List<string> input) {
-            long score = 0;
+            List<string> corrupt = Part1(input);
 
-            Dictionary<char, char> pairs = new Dictionary<char, char>() {
-                {'{', '}'},
-                {'[', ']'},
-                {'(', ')'},
-                {'<', '>'}
-            };
+            List<string> incomplete = input.Where(s => !corrupt.Contains(s)).ToList();
+
+            Part2(incomplete);
+        }        
+        
+        static List<string> Part1(List<string> input) {
+            List<string> corrupt = new List<string>();
+            long score = 0;
 
             Dictionary<char, long> scores = new Dictionary<char, long>() {
                 {')', 3},
@@ -102,13 +146,51 @@ namespace app
                     } else {
                         score += scores[c];
                         Console.WriteLine($"Expected {pairs[chunks.Peek()]} but found {c} instead. Score: {score}");
+                        corrupt.Add(line);
                         break;
                     }
                 }
             }
 
-            // Answer: 341823
-            Console.WriteLine($"Answer: {score}");
+            // Part 1 Answer: 341823
+            Console.WriteLine($"Part 1 Answer: {score}");
+
+            return corrupt;
+        }
+
+        static void Part2(List<string> incomplete) {
+            List<long> scores = new List<long>();
+
+            Dictionary<char, long> scoreMap = new Dictionary<char, long>() {
+                {')', 1},
+                {']', 2},
+                {'}', 3},
+                {'>', 4}
+            };
+
+            foreach (string line in incomplete) {
+                long score = 0;
+                List<char> autocomplete = new List<char>();
+                Stack<char> chunks = new Stack<char>();
+
+                foreach (char c in line) {
+                    if ("([{<".Contains(c)) {
+                        chunks.Push(c);
+                    } else if (c == pairs[chunks.Peek()]) {
+                        chunks.Pop();
+                    }
+                }
+
+                while (chunks.Count > 0) {
+                    score *=5;
+                    score += scoreMap[pairs[chunks.Pop()]];
+                }
+
+                scores.Add(score);
+            }
+
+            // Part 2 Answer: 2801302861
+            Console.WriteLine($"Part 2 Answer: {scores.OrderBy(s=>s).ToList()[(int)scores.Count/2]}");
         }
     }
 }
