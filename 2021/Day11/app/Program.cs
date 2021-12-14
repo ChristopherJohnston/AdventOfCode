@@ -301,6 +301,49 @@ namespace app
     After 100 steps, there have been a total of 1656 flashes.
 
     Given the starting energy levels of the dumbo octopuses in your cavern, simulate 100 steps. How many total flashes are there after 100 steps?
+
+    --- Part Two ---
+
+    It seems like the individual flashes aren't bright enough to navigate. However, you might have a better option: the flashes seem to be synchronizing!
+
+    In the example above, the first time all octopuses flash simultaneously is step 195:
+
+    After step 193:
+    5877777777
+    8877777777
+    7777777777
+    7777777777
+    7777777777
+    7777777777
+    7777777777
+    7777777777
+    7777777777
+    7777777777
+
+    After step 194:
+    6988888888
+    9988888888
+    8888888888
+    8888888888
+    8888888888
+    8888888888
+    8888888888
+    8888888888
+    8888888888
+    8888888888
+
+    After step 195:
+    0000000000
+    0000000000
+    0000000000
+    0000000000
+    0000000000
+    0000000000
+    0000000000
+    0000000000
+    0000000000
+    0000000000
+    If you can calculate the exact moments when the octopuses will all flash simultaneously, you should be able to navigate through the cavern. What is the first step during which all octopuses flash?
     */
     class Program
     {
@@ -320,14 +363,15 @@ namespace app
                 map[i] = input[i].Select(n => Int32.Parse(n.ToString())).ToArray();
             }
 
-            Part1(map);
+            SolvePuzzle(map);
         }
 
-        static void Part1(int[][] map) {
+        static void SolvePuzzle(int[][] map) {
             long totalFlashes = 0;
+            long step = 0;
             
-            for (int step=0;step<100;step++) {
-                
+            while (true) {
+                long flashesThisStep = 0;
                 Queue<(int r, int c)> flashers = new Queue<(int r, int c)>();
 
                 // Increase energy by 1
@@ -415,14 +459,26 @@ namespace app
                     for (int c=0;c<map[r].Length;c++) {
                         if (map[r][c] > 9) {
                             map[r][c] = 0;
-                            totalFlashes++;
+                            flashesThisStep++;
                         }
                     }
-                } 
-            }
+                }
 
-            // Part 1 Answer: 1632            
-            Console.WriteLine($"Part 1 Answer: {totalFlashes}");
+                totalFlashes += flashesThisStep;
+
+                if (step == 99) {
+                    // Part 1 Answer: 1632            
+                    Console.WriteLine($"Part 1 Answer: {totalFlashes}");
+                }
+
+                if (flashesThisStep == (map.Length * map[0].Length)) {
+                    // Part 2 Answer: 303
+                    Console.WriteLine($"Part 2 Answer: {step+1}");
+                    break;
+                }
+
+                step++;
+            }
         }
     }
 }
