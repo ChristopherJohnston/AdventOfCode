@@ -160,7 +160,7 @@ namespace app
         }
 
         static void Part2(List<(int x, int y)> map, List<(string axis, int position)> folds) {
-            // Go through all the folds
+            // Go through all the folds.
             foreach ((string axis, int position) fold in folds) {
                 map = Fold(map, fold.axis, fold.position);
             }
@@ -187,7 +187,7 @@ namespace app
             #..#.#.#..#..#.#....#....#..#.#..#.#..#
             #..#.#..#.#..#.####.#.....##...##..#..#
 
-            ARZHPCUH
+            ARHZPCUH
             */
             Console.WriteLine("Part 2 Answer:");
             
