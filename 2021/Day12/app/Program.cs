@@ -101,6 +101,52 @@ namespace app
     pj-fs
     start-RW
     How many paths through this cave system are there that visit small caves at most once?
+
+    --- Part Two ---
+
+    After reviewing the available paths, you realize you might have time to visit a single small cave twice. Specifically, big caves can be visited any number of times, a single small cave can be visited at most twice, and the remaining small caves can be visited at most once. However, the caves named start and end can only be visited exactly once each: once you leave the start cave, you may not return to it, and once you reach the end cave, the path must end immediately.
+
+    Now, the 36 possible paths through the first example above are:
+
+    start,A,b,A,b,A,c,A,end
+    start,A,b,A,b,A,end
+    start,A,b,A,b,end
+    start,A,b,A,c,A,b,A,end
+    start,A,b,A,c,A,b,end
+    start,A,b,A,c,A,c,A,end
+    start,A,b,A,c,A,end
+    start,A,b,A,end
+    start,A,b,d,b,A,c,A,end
+    start,A,b,d,b,A,end
+    start,A,b,d,b,end
+    start,A,b,end
+    start,A,c,A,b,A,b,A,end
+    start,A,c,A,b,A,b,end
+    start,A,c,A,b,A,c,A,end
+    start,A,c,A,b,A,end
+    start,A,c,A,b,d,b,A,end
+    start,A,c,A,b,d,b,end
+    start,A,c,A,b,end
+    start,A,c,A,c,A,b,A,end
+    start,A,c,A,c,A,b,end
+    start,A,c,A,c,A,end
+    start,A,c,A,end
+    start,A,end
+    start,b,A,b,A,c,A,end
+    start,b,A,b,A,end
+    start,b,A,b,end
+    start,b,A,c,A,b,A,end
+    start,b,A,c,A,b,end
+    start,b,A,c,A,c,A,end
+    start,b,A,c,A,end
+    start,b,A,end
+    start,b,d,b,A,c,A,end
+    start,b,d,b,A,end
+    start,b,d,b,end
+    start,b,end
+    The slightly larger example above now has 103 paths through it, and the even larger example now has 3509 paths through it.
+
+    Given these new rules, how many paths through this cave system are there?
     */
     class Program
     {
@@ -139,14 +185,15 @@ namespace app
                 }
             }
 
-            long result = TakePaths(paths, new List<string>(), "start");
-
             // Part 1 Answer: 5576
-            Console.WriteLine($"Part 1 Answer: {result}");
+            Console.WriteLine($"Part 1 Answer: {TakePaths(paths, new List<string>(), "start", 1)}");
+
+            // Part 2 Answer: 5576
+            Console.WriteLine($"Part 2 Answer: {TakePaths(paths, new List<string>(), "start", 2)}");
         }
 
-        static long TakePaths(Dictionary<string, List<string>> paths, List<string> visited, string current) {
-            visited.Add(current);
+        static long TakePaths(Dictionary<string, List<string>> paths, List<string> visited, string current, int maxVisits) {
+            visited.Add(current);        
 
             if (current == "end") {
                 // We've found a path to the end. Write out the full path and return 1.            
@@ -157,14 +204,23 @@ namespace app
 
                 // Iterate through the current cave's connections and try to find new paths to the end from this point.
                 foreach (string cave in paths[current]) {
-                    // We don't want to re-visit any small caves.
-                    if (char.IsLower(cave[0]) && visited.Contains(cave)) {
+
+                    // Have we visited any small caves more than the maximum number of times?
+                    var anyOverMaxVisits = visited
+                        .Where(x => x != "start" && x != "end" && char.IsLower(x[0]))
+                        .GroupBy(x => x)
+                        .Where(x => x.Count() >= maxVisits)
+                        .Any();
+
+                    // We don't want to re-visit any small caves more than once if we've already visited another more than the max times.
+                    // Once we've left the start, we don't want to go back to it.
+                    if ((char.IsLower(cave[0]) && visited.Contains(cave) && anyOverMaxVisits) || cave == "start") {
                         continue;
-                    }                    
+                    }
 
                     // Find any paths to the end from the current cave, keeping in mind any caves we've already visited
                     // on this pass.
-                    result += TakePaths(paths, new List<string>(visited), cave);
+                    result += TakePaths(paths, new List<string>(visited), cave, maxVisits);
                 }
 
                 return result;
