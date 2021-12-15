@@ -111,6 +111,12 @@ namespace app
     The transparent paper is pretty big, so for now, focus on just completing the first fold. After the first fold in the example above, 17 dots are visible - dots that end up overlapping after the fold is completed count as a single dot.
 
     How many dots are visible after completing just the first fold instruction on your transparent paper?
+
+    --- Part Two ---
+
+    Finish folding the transparent paper according to the instructions. The manual says the code is always eight capital letters.
+
+    What code do you use to activate the infrared thermal imaging camera system?
     */
     class Program
     {
@@ -140,19 +146,69 @@ namespace app
                 }
             }
 
-            Part1(map, folds);
+            Part1(new List<(int x, int y)>(map), folds);
+            Part2(new List<(int x, int y)>(map), folds);
         }
 
         static void Part1(List<(int x, int y)> map, List<(string axis, int position)> folds) {
-            // Get the first fold
-            int fold = folds[0].position;
+            // Take the first fold
+            var fold = folds.First();
+            var newMap = Fold(map, fold.axis, fold.position);
 
+            // Part 1 Answer: 747
+            Console.WriteLine($"Part 1 Answer: {newMap.Count()}");
+        }
+
+        static void Part2(List<(int x, int y)> map, List<(string axis, int position)> folds) {
+            // Go through all the folds
+            foreach ((string axis, int position) fold in folds) {
+                map = Fold(map, fold.axis, fold.position);
+            }
+
+            // Find the upper and lower bounds of the map
+            int minX = int.MaxValue;
+            int maxX = int.MinValue;
+            int minY = int.MaxValue;
+            int maxY = int.MinValue;
+
+            foreach ((int x, int y) coordinate in map) {
+                minX = Math.Min(minX, coordinate.x);
+                maxX = Math.Max(maxX, coordinate.x);
+                minY = Math.Min(minY, coordinate.y);
+                maxY = Math.Max(maxY, coordinate.y);
+            }
+
+            /*
+            Part 2 Answer:
+            .##..###..#..#.####.###...##..#..#.#..#
+            #..#.#..#.#..#....#.#..#.#..#.#..#.#..#
+            #..#.#..#.####...#..#..#.#....#..#.####
+            ####.###..#..#..#...###..#....#..#.#..#
+            #..#.#.#..#..#.#....#....#..#.#..#.#..#
+            #..#.#..#.#..#.####.#.....##...##..#..#
+
+            ARZHPCUH
+            */
+            Console.WriteLine("Part 2 Answer:");
+            
+            // Go through the map and print out the characters
+            for (int y=minY; y<=maxY; y++) {
+                for (int x=minX; x<=maxX; x++) {                
+                    string val = (map.Contains((x,y))) ?  "#" : ".";
+                    Console.Write(val);
+                }
+
+                Console.WriteLine("");
+            }            
+        }
+
+        static List<(int x, int y)> Fold(List<(int x, int y)> map, string axis, int position) {
             Dictionary<(int x, int y), (int x, int y)> toFold = new Dictionary<(int x, int y), (int x, int y)>();
 
             // Go through each item and determine its new position if it is greater than the fold position
             foreach ((int x, int y) coordinate in map) {
-                if ( (folds[0].axis == "y" && coordinate.y > fold) || (folds[0].axis == "x" && coordinate.x > fold) ) {
-                    (int x, int y) newCoordinate = (folds[0].axis == "y") ? (coordinate.x, fold - (coordinate.y-fold)) : (fold - (coordinate.x-fold), coordinate.y);
+                if ( (axis == "y" && coordinate.y > position) || (axis == "x" && coordinate.x > position) ) {
+                    (int x, int y) newCoordinate = (axis == "y") ? (coordinate.x, position - (coordinate.y-position)) : (position - (coordinate.x-position), coordinate.y);
                     toFold[coordinate] = newCoordinate;
                 }
             }
@@ -167,8 +223,7 @@ namespace app
                 }
             }
 
-            // Part 1 Answer: 747
-            Console.WriteLine($"Part 1 Answer: {map.Count()}");
+            return map;
         }
     }
 }
