@@ -188,7 +188,7 @@ namespace app
             // Part 1 Answer: 5576
             Console.WriteLine($"Part 1 Answer: {TakePaths(paths, new List<string>(), "start", 1)}");
 
-            // Part 2 Answer: 5576
+            // Part 2 Answer: 152837
             Console.WriteLine($"Part 2 Answer: {TakePaths(paths, new List<string>(), "start", 2)}");
         }
 
