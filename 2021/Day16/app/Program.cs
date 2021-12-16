@@ -91,10 +91,38 @@ namespace app
     C0015000016115A2E0802F182340 has the same structure as the previous example, but the outermost packet uses a different length type ID. This packet has a version sum of 23.
     A0016C880162017C3686B18A3D4780 is an operator packet that contains an operator packet that contains an operator packet that contains five literal values; it has a version sum of 31.
     Decode the structure of your hexadecimal-encoded BITS transmission; what do you get if you add up the version numbers in all packets?
+
+    --- Part Two ---
+
+    Now that you have the structure of your transmission decoded, you can calculate the value of the expression it represents.
+
+    Literal values (type ID 4) represent a single number as described above. The remaining type IDs are more interesting:
+
+    Packets with type ID 0 are sum packets - their value is the sum of the values of their sub-packets. If they only have a single sub-packet, their value is the value of the sub-packet.
+    Packets with type ID 1 are product packets - their value is the result of multiplying together the values of their sub-packets. If they only have a single sub-packet, their value is the value of the sub-packet.
+    Packets with type ID 2 are minimum packets - their value is the minimum of the values of their sub-packets.
+    Packets with type ID 3 are maximum packets - their value is the maximum of the values of their sub-packets.
+    Packets with type ID 5 are greater than packets - their value is 1 if the value of the first sub-packet is greater than the value of the second sub-packet; otherwise, their value is 0. These packets always have exactly two sub-packets.
+    Packets with type ID 6 are less than packets - their value is 1 if the value of the first sub-packet is less than the value of the second sub-packet; otherwise, their value is 0. These packets always have exactly two sub-packets.
+    Packets with type ID 7 are equal to packets - their value is 1 if the value of the first sub-packet is equal to the value of the second sub-packet; otherwise, their value is 0. These packets always have exactly two sub-packets.
+    Using these rules, you can now work out the value of the outermost packet in your BITS transmission.
+
+    For example:
+
+    C200B40A82 finds the sum of 1 and 2, resulting in the value 3.
+    04005AC33890 finds the product of 6 and 9, resulting in the value 54.
+    880086C3E88112 finds the minimum of 7, 8, and 9, resulting in the value 7.
+    CE00C43D881120 finds the maximum of 7, 8, and 9, resulting in the value 9.
+    D8005AC2A8F0 produces 1, because 5 is less than 15.
+    F600BC2D8F produces 0, because 5 is not greater than 15.
+    9C005AC2F8F0 produces 0, because 5 is not equal to 15.
+    9C0141080250320F1802104A08 produces 1, because 1 + 3 = 2 * 2.
+    What do you get if you evaluate the expression represented by your hexadecimal-encoded BITS transmission?
     */
     class Program
     {
-        static Dictionary<char, string> hexMap = new Dictionary<char, string>() {
+        static Dictionary<char, string> hexMap = new Dictionary<char, string>()
+        {
             {'0',"0000"},
             {'1',"0001"},
             {'2',"0010"},
@@ -116,7 +144,8 @@ namespace app
         static string file = @"input.txt";
         static void Main(string[] args)
         {
-            if (args.Length > 0) {
+            if (args.Length > 0)
+            {
                 file = args[0];
             }
             
@@ -125,37 +154,56 @@ namespace app
             Part1(input);
         }
 
-        static void Part1(string input) {
+        static void Part1(string input)
+        {
             string binaryString = string.Empty;
             // Convert to binary
-            foreach (char hex in input) {
+            foreach (char hex in input)
+            {
                 binaryString += hexMap[hex];
             }
 
-            ParseMessage(binaryString, null);
+            var ans = ParseMessage(binaryString, null);
             // Part 1 Answer: 908
             Console.WriteLine($"Part 1 Answer: {versionSum}");
+            // Part 2 Answer: 10626195124371
+            Console.WriteLine($"Part 2 Answer: {ans.values.First()}");
         }
         
         static long versionSum = 0;
 
-        static int ParseMessage(string binaryString, int? subPackets) {
+        static (int i, List<long> values) ParseMessage(string binaryString, int? subPackets)
+        {
             char[] message = binaryString.ToCharArray();
             int i=0;
             int packetsRead = 0;
-            while (i<message.Length - 6 && !message.Skip(i).All(c=>c=='0')) {
+
+            List<long> values = new List<long>();
+
+            // Keep going until there's no more characters left to parse a header
+            // or the rest of the message contains zeros.
+            while (i<message.Length - 6 && !message.Skip(i).All(c=>c=='0'))
+            {
                 // Get Packet Header
-                int version = Convert.ToInt32(string.Concat(message.Skip(i).Take(3)), 2);
-                versionSum += version;
+                versionSum += Convert.ToInt32(string.Concat(message.Skip(i).Take(3)), 2);
                 i+=3;
                 int typeId = Convert.ToInt32(string.Concat(message.Skip(i).Take(3)), 2);
                 i+=3;
 
                 if (typeId == 4)
                 {
-                    // literal value
-                    (long value, int newI) = GetLiteralValue(message, i);
-                    i = newI;
+                    // Literal value
+                    string valueString = string.Empty;
+                    IEnumerable<char> n;
+                    do
+                    {
+                        n = message.Skip(i).Take(5);
+                        valueString += string.Concat(n.Skip(1));
+                        i+=5;
+                    }
+                    while (n.First() == '1');
+                    
+                    values.Add(Convert.ToInt64(valueString, 2));
                 }
                 else
                 {
@@ -163,43 +211,73 @@ namespace app
                     int lengthId = Convert.ToInt32(string.Concat(message.Skip(i).Take(1)), 2);
                     i++;
 
-                    if (lengthId == 0) {
-                        // one sub-packet with specific length length
+                    (int i, List<long> values) retVal;
+
+                    if (lengthId == 0)
+                    {
+                        // one subpacket with a specific length, recurse and pass in the subpacket.
                         int subPacketLength = Convert.ToInt32(string.Concat(message.Skip(i).Take(15)), 2);
                         i+= 15;
-                        ParseMessage(string.Concat(message.Skip(i).Take(subPacketLength)), null);
+                        string subPacket = string.Concat(message.Skip(i).Take(subPacketLength));
+                        retVal = ParseMessage(subPacket, null);
                         i+= subPacketLength;
                     }
                     else
                     {
-                        // a number of sub-packets of unspecified length
+                        // a number of subpackets of unspecified length, recurse and pass in the rest of the message
+                        // along with the target number of subpackets.                        
                         int numSubPackets = Convert.ToInt32(string.Concat(message.Skip(i).Take(11)), 2);
                         i+= 11;
-                        i += ParseMessage(string.Concat(message.Skip(i)), numSubPackets);
+                        retVal = ParseMessage(string.Concat(message.Skip(i)), numSubPackets);
+                        i+= retVal.i;
+                    }
+
+                    switch (typeId)
+                    {
+                        case 0:
+                            // sum
+                            values.Add(retVal.values.Sum());
+                            break;
+                        case 1:
+                            // product
+                            values.Add(retVal.values.Aggregate((long)1, (acc, val) => acc * val));
+                            break;
+                        case 2:
+                            // min
+                            values.Add(retVal.values.Min());
+                            break;
+                        case 3:
+                            // max
+                            values.Add(retVal.values.Max());
+                            break;
+                        case  5:
+                            // greater than
+                            values.Add(retVal.values[0] > retVal.values[1] ? 1 : 0);
+                            break;
+                        case 6:
+                            // less than
+                            values.Add(retVal.values[0] < retVal.values[1] ? 1 : 0);
+                            break;
+                        case 7:
+                            // equal
+                            values.Add(retVal.values[0] == retVal.values[1] ? 1 : 0);
+                            break;
+                        default:
+                            // something went wrong
+                            throw new ArgumentException($"Type Id {typeId} is not supported!");
                     }
                 }
 
                 packetsRead++;
 
-                if ((subPackets.HasValue && packetsRead==subPackets.Value)) {
+                if ((subPackets.HasValue && packetsRead==subPackets.Value))
+                {
+                    // The required number of subpackets have been parsed.
                     break;
                 }
             }
 
-            return i;
-        }
-
-        static (long value, int i) GetLiteralValue(char[] message, int i) {
-            string valueString = string.Empty;
-            IEnumerable<char> n;
-            do {
-                n = message.Skip(i).Take(5);
-                valueString += string.Concat(n.Skip(1));
-                i+=5;
-            } while (n.First() == '1');
-            long value = Convert.ToInt64(valueString, 2);
-            Console.WriteLine($"Value {value}");
-            return (value, i);
+            return (i, values);
         }
     }
 }
